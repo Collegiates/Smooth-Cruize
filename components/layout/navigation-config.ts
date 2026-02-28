@@ -14,8 +14,8 @@ export const adminNavGroups = [
     defaultOpen: true,
     items: [
       { href: "/admin/dashboard", label: "Dashboard", icon: "layout-dashboard" as NavIconName },
-      { href: "/map", label: "Map", icon: "map" as NavIconName },
-      { href: "/admin/dashboard?view=map", label: "Work Orders", icon: "clipboard-list" as NavIconName }
+      { href: "/admin/map", label: "Map", icon: "map" as NavIconName },
+      { href: "/admin/map", label: "Work Orders", icon: "clipboard-list" as NavIconName }
     ]
   },
   {
