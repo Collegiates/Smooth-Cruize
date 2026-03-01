@@ -4,3 +4,5 @@ python-dotenv
 pydantic
 supabase
 google-generativeai
+ultralytics>=8.0.0
+opencv-python>=4.8.0
