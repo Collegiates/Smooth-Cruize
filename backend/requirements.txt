@@ -3,6 +3,7 @@ uvicorn
 python-dotenv
 pydantic
 supabase
-google-generativeai
+google-genai
 ultralytics>=8.0.0
 opencv-python>=4.8.0
+python-multipart

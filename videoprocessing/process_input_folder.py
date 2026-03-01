@@ -121,7 +121,7 @@ def write_clip(
         return 0
 
     height, width = first_frame.shape[:2]
-    fourcc = cv2.VideoWriter_fourcc(*"mp4v")
+    fourcc = cv2.VideoWriter_fourcc(*"avc1")
     writer = cv2.VideoWriter(str(output_path), fourcc, fps, (width, height))
 
     written = 0
