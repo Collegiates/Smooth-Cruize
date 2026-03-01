@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/components/ui/toast-provider";
+import { useSupabase } from "@/components/supabase-provider";
 import { Widget } from "@/components/ui/widget";
 import { exportEventsAsCsv, getPotholeEvents, updatePotholeEvent } from "@/lib/api/pothole-events";
 import type { EventFilters, PotholeEvent, PotholeStatus } from "@/lib/types";
@@ -35,6 +36,7 @@ function sortEvents(events: PotholeEvent[], sortDescending: boolean) {
 
 export function AdminMapView() {
   const { pushToast } = useToast();
+  const supabase = useSupabase();
   const [filters, setFilters] = useState<EventFilters>(initialFilters);
   const [events, setEvents] = useState<PotholeEvent[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<PotholeEvent | null>(null);
@@ -45,7 +47,7 @@ export function AdminMapView() {
 
   const refreshEvents = async () => {
     setLoading(true);
-    const nextEvents = await getPotholeEvents(filters);
+    const nextEvents = await getPotholeEvents(filters, supabase);
     const sortedEvents = sortEvents(nextEvents, sortDescending);
     setEvents(sortedEvents);
     setSelectedEvent((current) => sortedEvents.find((event) => event.id === current?.id) ?? sortedEvents[0] ?? null);
@@ -165,9 +167,8 @@ export function AdminMapView() {
             </Button>
             <button
               type="button"
-              className={`inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-sm ${
-                liveUpdates ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-gray-200 bg-white text-gray-600"
-              }`}
+              className={`inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-sm ${liveUpdates ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-gray-200 bg-white text-gray-600"
+                }`}
               onClick={() => setLiveUpdates((value) => !value)}
             >
               <Radio className="h-4 w-4" />
@@ -216,6 +217,7 @@ function DrawerPanel({
   onUpdated: (event: PotholeEvent) => void;
 }) {
   const { pushToast } = useToast();
+  const supabase = useSupabase();
   const [status, setStatus] = useState<PotholeStatus>("open");
   const [assignedTo, setAssignedTo] = useState("");
   const [saving, setSaving] = useState(false);
@@ -239,7 +241,7 @@ function DrawerPanel({
       const updated = await updatePotholeEvent(event.id, {
         status: nextStatus,
         assigned_to: assignedTo
-      });
+      }, supabase);
       onUpdated(updated);
       pushToast({ title: "Work order updated", description: `Status changed to ${updated.status}.` });
     } catch {
@@ -251,9 +253,8 @@ function DrawerPanel({
 
   return (
     <aside
-      className={`fixed inset-y-4 right-4 z-40 w-full max-w-[380px] rounded-2xl border border-gray-200 bg-white shadow-sm transition-transform ${
-        open ? "translate-x-0" : "translate-x-[110%]"
-      }`}
+      className={`fixed inset-y-4 right-4 z-40 w-full max-w-[380px] rounded-2xl border border-gray-200 bg-white shadow-sm transition-transform ${open ? "translate-x-0" : "translate-x-[110%]"
+        }`}
       aria-hidden={!open}
     >
       <div className="flex h-full flex-col">

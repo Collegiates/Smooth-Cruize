@@ -2,33 +2,27 @@
 
 import { eachDayOfInterval, endOfDay, format, startOfDay, subDays } from "date-fns";
 
-import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
 import { getPotholeEvents } from "@/lib/api/pothole-events";
 import type { DailyPotholeStat, DailyPotholeSummary, PotholeEvent } from "@/lib/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 type DailyPotholeAnalytics = {
   stats: DailyPotholeStat[];
   summary: DailyPotholeSummary;
 };
 
-export async function getDailyPotholeStats(): Promise<DailyPotholeAnalytics> {
-  const events = await loadEventsForAnalytics();
+export async function getDailyPotholeStats(supabase?: SupabaseClient): Promise<DailyPotholeAnalytics> {
+  const events = await loadEventsForAnalytics(supabase);
 
-  if (!hasSupabaseEnv()) {
+  if (!supabase) {
     return buildMockDailyAnalytics(events);
   }
 
   return buildDailyAnalytics(events);
 }
 
-async function loadEventsForAnalytics(): Promise<PotholeEvent[]> {
-  if (hasSupabaseEnv()) {
-    const supabase = getSupabaseBrowserClient();
-
-    if (!supabase) {
-      return [];
-    }
-
+async function loadEventsForAnalytics(supabase?: SupabaseClient): Promise<PotholeEvent[]> {
+  if (supabase) {
     const { data, error } = await supabase
       .from("pothole_events")
       .select("*")
@@ -41,7 +35,7 @@ async function loadEventsForAnalytics(): Promise<PotholeEvent[]> {
     return (data as PotholeEvent[]) ?? [];
   }
 
-  return getPotholeEvents();
+  return getPotholeEvents(undefined, supabase);
 }
 
 function buildDailyAnalytics(events: PotholeEvent[]): DailyPotholeAnalytics {
@@ -74,10 +68,10 @@ function buildDailyAnalytics(events: PotholeEvent[]): DailyPotholeAnalytics {
   const averageSeverity7d =
     recentSeverityEvents.length > 0
       ? Number(
-          (
-            recentSeverityEvents.reduce((sum, event) => sum + event.severity, 0) / recentSeverityEvents.length
-          ).toFixed(1)
-        )
+        (
+          recentSeverityEvents.reduce((sum, event) => sum + event.severity, 0) / recentSeverityEvents.length
+        ).toFixed(1)
+      )
       : 0;
 
   const summary: DailyPotholeSummary = {
@@ -116,10 +110,10 @@ function buildMockDailyAnalytics(events: PotholeEvent[]): DailyPotholeAnalytics 
   const averageSeverity7d =
     recentSeverityEvents.length > 0
       ? Number(
-          (
-            recentSeverityEvents.reduce((sum, event) => sum + event.severity, 0) / recentSeverityEvents.length
-          ).toFixed(1)
-        )
+        (
+          recentSeverityEvents.reduce((sum, event) => sum + event.severity, 0) / recentSeverityEvents.length
+        ).toFixed(1)
+      )
       : 6.4;
 
   return {

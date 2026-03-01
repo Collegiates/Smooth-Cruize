@@ -2,10 +2,10 @@
 
 import { subHours } from "date-fns";
 
-import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
 import { mockEvents, mockEventsVersion } from "@/lib/mock/pothole-events";
 import { readLocalStorage, storageKeys, writeLocalStorage } from "@/lib/storage";
 import type { DashboardMetrics, EventFilters, PotholeEvent } from "@/lib/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 function getMockEventsStore() {
   const storedVersion = readLocalStorage<number>(storageKeys.mockEventsVersionKey, 0);
@@ -50,14 +50,8 @@ function applyFilters(events: PotholeEvent[], filters?: EventFilters) {
   });
 }
 
-export async function getPotholeEvents(filters?: EventFilters): Promise<PotholeEvent[]> {
-  if (hasSupabaseEnv()) {
-    const supabase = getSupabaseBrowserClient();
-
-    if (!supabase) {
-      return [];
-    }
-
+export async function getPotholeEvents(filters?: EventFilters, supabase?: SupabaseClient): Promise<PotholeEvent[]> {
+  if (supabase) {
     let query = supabase.from("pothole_events").select("*").order("severity", { ascending: false });
 
     if (filters?.status && filters.status !== "all") {
@@ -90,10 +84,9 @@ export async function getPotholeEvents(filters?: EventFilters): Promise<PotholeE
   return applyFilters(events, filters).sort((a, b) => b.severity - a.severity);
 }
 
-export async function getPotholeEventById(id: string): Promise<PotholeEvent | null> {
-  if (hasSupabaseEnv()) {
-    const supabase = getSupabaseBrowserClient();
-    const { data, error } = await supabase!.from("pothole_events").select("*").eq("id", id).single();
+export async function getPotholeEventById(id: string, supabase?: SupabaseClient): Promise<PotholeEvent | null> {
+  if (supabase) {
+    const { data, error } = await supabase.from("pothole_events").select("*").eq("id", id).single();
 
     if (error) {
       throw error;
@@ -107,11 +100,11 @@ export async function getPotholeEventById(id: string): Promise<PotholeEvent | nu
 
 export async function updatePotholeEvent(
   id: string,
-  payload: Partial<PotholeEvent>
+  payload: Partial<PotholeEvent>,
+  supabase?: SupabaseClient
 ): Promise<PotholeEvent> {
-  if (hasSupabaseEnv()) {
-    const supabase = getSupabaseBrowserClient();
-    const { data, error } = await supabase!
+  if (supabase) {
+    const { data, error } = await supabase
       .from("pothole_events")
       .update(payload)
       .eq("id", id)
@@ -139,7 +132,8 @@ export async function updatePotholeEvent(
 
 export async function createPotholeEvent(
   payload: Pick<PotholeEvent, "latitude" | "longitude" | "severity" | "status" | "detected_at" | "clip_url"> &
-    Partial<PotholeEvent>
+    Partial<PotholeEvent>,
+  supabase?: SupabaseClient
 ) {
   const draft: PotholeEvent = {
     id: crypto.randomUUID(),
@@ -153,9 +147,8 @@ export async function createPotholeEvent(
     ...payload
   };
 
-  if (hasSupabaseEnv()) {
-    const supabase = getSupabaseBrowserClient();
-    const { data, error } = await supabase!.from("pothole_events").insert(draft).select("*").single();
+  if (supabase) {
+    const { data, error } = await supabase.from("pothole_events").insert(draft).select("*").single();
 
     if (error) {
       throw error;

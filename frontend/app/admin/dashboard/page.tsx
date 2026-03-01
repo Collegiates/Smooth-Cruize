@@ -10,6 +10,7 @@ import { WorkOrdersTable } from "@/components/work-orders/work-orders-table";
 import { Button } from "@/components/ui/button";
 import { Widget } from "@/components/ui/widget";
 import { useToast } from "@/components/ui/toast-provider";
+import { useSupabase } from "@/components/supabase-provider";
 import { exportEventsAsCsv, getPotholeEvents } from "@/lib/api/pothole-events";
 import { getDailyPotholeStats } from "@/lib/analytics";
 import type { DailyPotholeStat, DailyPotholeSummary, EventFilters, PotholeEvent, PotholeStatus } from "@/lib/types";
@@ -31,6 +32,7 @@ function sortEvents(events: PotholeEvent[], sortDescending: boolean) {
 
 export default function AdminDashboardPage() {
   const { pushToast } = useToast();
+  const supabase = useSupabase();
   const [filters, setFilters] = useState<EventFilters>(initialFilters);
   const [events, setEvents] = useState<PotholeEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -48,8 +50,8 @@ export default function AdminDashboardPage() {
     setLoading(true);
     setAnalyticsLoading(true);
     const [nextEvents, analytics] = await Promise.all([
-      getPotholeEvents(filters),
-      getDailyPotholeStats()
+      getPotholeEvents(filters, supabase),
+      getDailyPotholeStats(supabase)
     ]);
     const sortedEvents = sortEvents(nextEvents, sortDescending);
     setEvents(sortedEvents);
@@ -139,11 +141,10 @@ export default function AdminDashboardPage() {
           <button
             key={status}
             type="button"
-            className={`rounded-full border px-3 py-1 text-xs transition-colors ${
-              (filters.status ?? "all") === status
-                ? "border-blue-200 bg-blue-50 text-blue-700"
-                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
-            }`}
+            className={`rounded-full border px-3 py-1 text-xs transition-colors ${(filters.status ?? "all") === status
+              ? "border-blue-200 bg-blue-50 text-blue-700"
+              : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
+              }`}
             onClick={() => handleQuickFilter(status)}
           >
             {status === "all" ? "All" : status.replace("_", " ")}

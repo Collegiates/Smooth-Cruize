@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 import { getCurrentSession, loginAsDemo, loginWithPassword, logout } from "@/lib/auth";
 import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
+
 import type { AppSession, UserRole } from "@/lib/types";
 
 type SessionContextValue = {
@@ -18,13 +19,14 @@ type SessionContextValue = {
 const SessionContext = createContext<SessionContextValue | null>(null);
 
 export function SessionProvider({ children }: { children: React.ReactNode }) {
+  const supabase = useSupabase();
   const [session, setSession] = useState<AppSession | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const refreshSession = async () => {
     setIsLoading(true);
     try {
-      const nextSession = await getCurrentSession();
+      const nextSession = await getCurrentSession(supabase);
       setSession(nextSession);
     } catch (error) {
       console.error("Failed to refresh session:", error);
@@ -37,6 +39,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const hydrateSession = async () => {
       setIsLoading(true);
+<<<<<<< HEAD:hooks/use-session.tsx
       try {
         const nextSession = await getCurrentSession();
         setSession(nextSession);
@@ -71,13 +74,22 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       subscription.unsubscribe();
     };
   }, []);
+=======
+      const nextSession = await getCurrentSession(supabase);
+      setSession(nextSession);
+      setIsLoading(false);
+    };
+
+    void hydrateSession();
+  }, [supabase]);
+>>>>>>> tbranch3:frontend/hooks/use-session.tsx
 
   const value: SessionContextValue = {
     session,
     isLoading,
     refreshSession,
     signIn: async (email, password) => {
-      await loginWithPassword(email, password);
+      await loginWithPassword(email, password, supabase);
       await refreshSession();
     },
     signInDemo: async (role) => {
@@ -85,7 +97,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       await refreshSession();
     },
     signOut: async () => {
-      await logout();
+      await logout(supabase);
       await refreshSession();
     }
   };

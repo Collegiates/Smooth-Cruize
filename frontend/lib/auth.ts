@@ -1,10 +1,11 @@
 "use client";
 
 import { demoSessions } from "@/lib/mock/pothole-events";
-import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
 import { readLocalStorage, storageKeys, writeLocalStorage } from "@/lib/storage";
 import type { AppSession, Profile, UserRole } from "@/lib/types";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
+<<<<<<< HEAD:lib/auth.ts
 function buildSessionProfile({
   id,
   email,
@@ -36,6 +37,13 @@ export async function getCurrentSession(): Promise<AppSession | null> {
       const {
         data: { session }
       } = await supabase.auth.getSession();
+=======
+export async function getCurrentSession(supabase?: SupabaseClient): Promise<AppSession | null> {
+  if (supabase) {
+    const {
+      data: { session }
+    } = await supabase.auth.getSession();
+>>>>>>> tbranch3:frontend/lib/auth.ts
 
       if (!session?.user) {
         return null;
@@ -72,14 +80,8 @@ export async function getCurrentSession(): Promise<AppSession | null> {
   return readLocalStorage<AppSession | null>(storageKeys.mockSessionKey, null);
 }
 
-export async function loginWithPassword(email: string, password: string) {
-  if (hasSupabaseEnv()) {
-    const supabase = getSupabaseBrowserClient();
-
-    if (!supabase) {
-      throw new Error("Supabase client unavailable.");
-    }
-
+export async function loginWithPassword(email: string, password: string, supabase?: SupabaseClient) {
+  if (supabase) {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
@@ -117,13 +119,9 @@ export async function loginAsDemo(role: UserRole) {
   writeLocalStorage(storageKeys.mockSessionKey, demoSessions[role]);
 }
 
-export async function logout() {
-  if (hasSupabaseEnv()) {
-    const supabase = getSupabaseBrowserClient();
-
-    if (supabase) {
-      await supabase.auth.signOut();
-    }
+export async function logout(supabase?: SupabaseClient) {
+  if (supabase) {
+    await supabase.auth.signOut();
   }
 
   writeLocalStorage(storageKeys.mockSessionKey, null);

@@ -7,6 +7,8 @@ import type { PotholeEvent } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 
+import { useGoogleMapsApiKey } from "@/components/supabase-provider";
+
 type PotholeMapProps = {
   events: PotholeEvent[];
   selectedEventId?: string;
@@ -34,7 +36,7 @@ export function PotholeMap({
   loading,
   className
 }: PotholeMapProps) {
-  const googleMapsApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  const googleMapsApiKey = useGoogleMapsApiKey();
 
   if (loading) {
     return <Skeleton className={cn("h-[560px] w-full rounded-sm", className)} />;
@@ -103,9 +105,9 @@ function LiveMap({
         center={
           selectedEvent
             ? {
-                lat: selectedEvent.latitude,
-                lng: selectedEvent.longitude
-              }
+              lat: selectedEvent.latitude,
+              lng: selectedEvent.longitude
+            }
             : defaultCenter
         }
         zoom={12}
@@ -138,17 +140,17 @@ function LiveMap({
 
         {showHeatmap
           ? events.map((event) => (
-              <CircleF
-                key={`${event.id}-heat`}
-                center={{ lat: event.latitude, lng: event.longitude }}
-                radius={event.severity * 35}
-                options={{
-                  fillOpacity: 0.12,
-                  strokeOpacity: 0,
-                  fillColor: event.severity >= 7 ? "#f97316" : "#0ea5e9"
-                }}
-              />
-            ))
+            <CircleF
+              key={`${event.id}-heat`}
+              center={{ lat: event.latitude, lng: event.longitude }}
+              radius={event.severity * 35}
+              options={{
+                fillOpacity: 0.12,
+                strokeOpacity: 0,
+                fillColor: event.severity >= 7 ? "#f97316" : "#0ea5e9"
+              }}
+            />
+          ))
           : null}
       </GoogleMap>
     </div>

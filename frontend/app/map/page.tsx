@@ -10,6 +10,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { publicNavGroups } from "@/components/layout/navigation-config";
 import { SeverityBadge } from "@/components/work-orders/severity-badge";
 import { StatusBadge } from "@/components/work-orders/status-badge";
+import { useSupabase } from "@/components/supabase-provider";
 import { Button } from "@/components/ui/button";
 import { Widget } from "@/components/ui/widget";
 import { getPotholeEvents } from "@/lib/api/pothole-events";
@@ -27,6 +28,7 @@ const initialFilters: EventFilters = {
 
 export default function MapPage() {
   const { session } = useSession();
+  const supabase = useSupabase();
   const [filters, setFilters] = useState<EventFilters>(initialFilters);
   const [events, setEvents] = useState<PotholeEvent[]>([]);
   const [selectedEventId, setSelectedEventId] = useState<string | undefined>();
@@ -35,7 +37,7 @@ export default function MapPage() {
   useEffect(() => {
     const run = async () => {
       setLoading(true);
-      const nextEvents = await getPotholeEvents(filters);
+      const nextEvents = await getPotholeEvents(filters, supabase);
       setEvents(nextEvents);
       setSelectedEventId((current) =>
         current && nextEvents.some((event) => event.id === current) ? current : nextEvents[0]?.id
@@ -44,7 +46,7 @@ export default function MapPage() {
     };
 
     void run();
-  }, [filters]);
+  }, [filters, supabase]);
 
   const selectedEvent = events.find((event) => event.id === selectedEventId) ?? null;
   const topIssuesNearby = useMemo(() => [...events].sort((a, b) => b.severity - a.severity).slice(0, 5), [events]);
