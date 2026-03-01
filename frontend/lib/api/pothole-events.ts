@@ -53,12 +53,12 @@ function normalizeEvent(record: Record<string, unknown>): PotholeEvent {
     confidence: typeof record.confidence === "number" && Number.isFinite(record.confidence) ? record.confidence : 0.65,
     status:
       typeof record.status === "string" &&
-      ["open", "assigned", "in_progress", "resolved", "rejected"].includes(record.status)
+        ["open", "assigned", "in_progress", "resolved", "rejected"].includes(record.status)
         ? (record.status as PotholeEvent["status"])
         : "open",
     lane_position:
       typeof record.lane_position === "string" &&
-      ["left", "center", "right", "unknown"].includes(record.lane_position)
+        ["left", "center", "right", "unknown"].includes(record.lane_position)
         ? (record.lane_position as PotholeEvent["lane_position"])
         : "unknown",
     description_ai: typeof record.description_ai === "string" ? record.description_ai : "",
