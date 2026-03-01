@@ -1,5 +1,6 @@
 import os
 import json
+import ssl
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
@@ -8,6 +9,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pydantic import BaseModel
+
+try:
+    import certifi
+except ImportError:  # pragma: no cover - dependency is expected in runtime
+    certifi = None
 
 load_dotenv()
 
@@ -57,6 +63,18 @@ def get_supabase_config():
     return supabase_url, supabase_key
 
 
+def get_ssl_context():
+    ca_file = os.getenv("SUPABASE_SSL_CA_FILE", "").strip()
+
+    if ca_file:
+        return ssl.create_default_context(cafile=ca_file)
+
+    if certifi:
+        return ssl.create_default_context(cafile=certifi.where())
+
+    return ssl.create_default_context()
+
+
 def supabase_request(path: str, method: str = "GET", body: dict | None = None, prefer: str | None = None):
     supabase_url, supabase_key = get_supabase_config()
     url = f"{supabase_url}/rest/v1/{path}"
@@ -73,13 +91,22 @@ def supabase_request(path: str, method: str = "GET", body: dict | None = None, p
     request = Request(url, headers=headers, data=request_body, method=method)
 
     try:
-        with urlopen(request) as response:
+        with urlopen(request, context=get_ssl_context(), timeout=20) as response:
             payload = response.read().decode("utf-8")
             return json.loads(payload) if payload else None
     except HTTPError as error:
         detail = error.read().decode("utf-8")
         raise HTTPException(status_code=error.code, detail=detail or "Supabase request failed.") from error
     except URLError as error:
+        if isinstance(error.reason, ssl.SSLCertVerificationError):
+            raise HTTPException(
+                status_code=502,
+                detail=(
+                    "Failed to verify Supabase TLS certificate. "
+                    "Install backend dependencies (`pip install -r requirements.txt`) "
+                    "or set SUPABASE_SSL_CA_FILE to a valid CA bundle path."
+                ),
+            ) from error
         raise HTTPException(status_code=502, detail=f"Failed to reach Supabase: {error.reason}") from error
 
 

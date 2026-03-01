@@ -100,11 +100,11 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="space-y-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 relative z-10">
         <div>
-          <div className="text-lg font-semibold text-slate-900">Municipal Operations Overview</div>
-          <div className="text-sm text-slate-600">Daily pothole activity, work order backlog, and service distribution.</div>
+          <h1 className="text-3xl font-display font-semibold tracking-tight text-white/90 drop-shadow-md">Municipal Operations Overview</h1>
+          <div className="text-sm font-medium text-cyan-200/80 uppercase tracking-widest mt-1">Daily pothole activity, work order backlog, and service distribution.</div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -125,11 +125,12 @@ export default function AdminDashboardPage() {
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-4 relative z-10">
         {metrics.map((metric) => (
-          <div key={metric.label} className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
-            <div className="text-xs uppercase tracking-wide text-slate-600">{metric.label}</div>
-            <div className="mt-1 text-xl font-semibold tabular-nums text-slate-900">{metric.value}</div>
+          <div key={metric.label} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/0 px-5 py-6 backdrop-blur-xl transition-all duration-300 hover:border-cyan-400/30 hover:shadow-[0_0_30px_-5px_var(--tw-shadow-color)] hover:shadow-cyan-500/20">
+            <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+            <div className="relative z-10 text-xs font-bold uppercase tracking-[0.2em] text-cyan-300/80">{metric.label}</div>
+            <div className="relative z-10 mt-2 text-4xl font-light tabular-nums tracking-tighter text-white drop-shadow-[0_2px_10px_rgba(255,255,255,0.2)]">{metric.value}</div>
           </div>
         ))}
       </div>
@@ -141,9 +142,9 @@ export default function AdminDashboardPage() {
           <button
             key={status}
             type="button"
-            className={`rounded-full border px-3 py-1 text-xs transition-colors ${(filters.status ?? "all") === status
-              ? "border-blue-200 bg-blue-50 text-blue-700"
-              : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
+            className={`rounded-full border px-4 py-1.5 text-xs font-semibold tracking-wider transition-all duration-300 ${(filters.status ?? "all") === status
+              ? "border-cyan-400/50 bg-cyan-500/20 text-cyan-100 shadow-[0_0_15px_-3px_rgba(34,211,238,0.4)]"
+              : "border-white/10 bg-white/5 text-slate-400 hover:border-cyan-400/30 hover:bg-cyan-900/20 hover:text-cyan-200"
               }`}
             onClick={() => handleQuickFilter(status)}
           >
@@ -210,21 +211,21 @@ export default function AdminDashboardPage() {
 function StatusChart() {
   const series = [
     { label: "Open", value: 22, color: "#f59e0b" },
-    { label: "Assigned", value: 15, color: "#2563eb" },
-    { label: "In Progress", value: 11, color: "#7c3aed" },
-    { label: "Resolved", value: 18, color: "#16a34a" }
+    { label: "Assigned", value: 15, color: "#38bdf8" },
+    { label: "In Progress", value: 11, color: "#c084fc" },
+    { label: "Resolved", value: 18, color: "#2dd4bf" }
   ];
   const max = Math.max(...series.map((item) => item.value));
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {series.map((item) => (
-        <div key={item.label} className="grid grid-cols-[100px_1fr_36px] items-center gap-3">
-          <span className="text-sm text-slate-600">{item.label}</span>
-          <div className="h-2 rounded-full bg-slate-100">
-            <div className="h-2 rounded-full" style={{ width: `${(item.value / max) * 100}%`, backgroundColor: item.color }} />
+        <div key={item.label} className="group grid grid-cols-[110px_1fr_40px] items-center gap-4">
+          <span className="text-sm font-medium tracking-wide text-slate-300">{item.label}</span>
+          <div className="relative h-2.5 overflow-hidden rounded-full bg-slate-800/80 shadow-inner">
+            <div className="absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-in-out group-hover:brightness-125" style={{ width: `${(item.value / max) * 100}%`, backgroundColor: item.color, boxShadow: `0 0 10px ${item.color}80` }} />
           </div>
-          <span className="text-right text-sm font-medium tabular-nums text-slate-900">{item.value}</span>
+          <span className="text-right text-sm font-bold tabular-nums text-white group-hover:text-cyan-100 transition-colors">{item.value}</span>
         </div>
       ))}
     </div>
@@ -243,17 +244,23 @@ function MonthlyBars() {
   const max = Math.max(...months.map((item) => item.value));
 
   return (
-    <svg viewBox="0 0 360 220" className="w-full">
+    <svg viewBox="0 0 360 220" className="w-full drop-shadow-lg">
+      <defs>
+        <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#22d3ee" />
+          <stop offset="100%" stopColor="#0284c7" stopOpacity="0.4" />
+        </linearGradient>
+      </defs>
       {months.map((item, index) => {
         const x = 20 + index * 55;
         const barHeight = (item.value / max) * 130;
         return (
-          <g key={item.month}>
-            <rect x={x} y={170 - barHeight} width="28" height={barHeight} rx="6" fill="#38bdf8" />
-            <text x={x + 14} y={190} textAnchor="middle" fontSize="12" fill="#475569">
+          <g key={item.month} className="group transition-all duration-300 hover:opacity-80 cursor-default">
+            <rect x={x} y={170 - barHeight} width="28" height={barHeight} rx="6" fill="url(#barGrad)" />
+            <text x={x + 14} y={190} textAnchor="middle" fontSize="12" fontWeight="600" fill="#94a3b8">
               {item.month}
             </text>
-            <text x={x + 14} y={160 - barHeight} textAnchor="middle" fontSize="11" fill="#0f172a">
+            <text x={x + 14} y={160 - barHeight} textAnchor="middle" fontSize="12" fontWeight="bold" fill="#f8fafc" className="opacity-0 group-hover:opacity-100 transition-opacity">
               {item.value}
             </text>
           </g>
@@ -279,18 +286,22 @@ function ServicesDonut() {
     .join(", ")})`;
 
   return (
-    <div className="grid gap-4 md:grid-cols-[160px_1fr]">
-      <div className="relative mx-auto h-40 w-40 rounded-full" style={{ background: gradient }}>
-        <div className="absolute inset-6 rounded-full bg-white" />
+    <div className="grid gap-6 md:grid-cols-[160px_1fr] items-center">
+      <div className="relative mx-auto h-40 w-40 rounded-full shadow-[0_0_30px_-5px_var(--tw-shadow-color)] shadow-cyan-500/20" style={{ background: gradient }}>
+        <div className="absolute inset-6 rounded-full bg-[hsl(222,47%,11%)] flex items-center justify-center shadow-inner">
+          <div className="text-center">
+            <div className="text-2xl font-light text-white leading-none tracking-tighter">100<span className="text-sm text-cyan-400">%</span></div>
+          </div>
+        </div>
       </div>
-      <div className="space-y-2">
+      <div className="space-y-2.5">
         {slices.map((slice) => (
-          <div key={slice.label} className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
-            <div className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-full" style={{ backgroundColor: slice.color }} />
-              <span className="text-slate-700">{slice.label}</span>
+          <div key={slice.label} className="group flex items-center justify-between rounded-xl border border-white/5 bg-white/5 px-4 py-2.5 text-sm backdrop-blur transition-colors hover:bg-white/10 hover:border-white/10">
+            <div className="flex items-center gap-3">
+              <span className="h-3.5 w-3.5 rounded-full" style={{ backgroundColor: slice.color, boxShadow: `0 0 8px ${slice.color}` }} />
+              <span className="text-slate-200 font-medium tracking-wide group-hover:text-white transition-colors">{slice.label}</span>
             </div>
-            <span className="font-medium tabular-nums text-slate-900">{slice.value}%</span>
+            <span className="font-bold tabular-nums text-white/90">{slice.value}%</span>
           </div>
         ))}
       </div>

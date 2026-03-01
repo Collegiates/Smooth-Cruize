@@ -37,24 +37,24 @@ export function WorkOrdersTable({
   return (
     <Table className={dense ? "text-xs" : undefined}>
       <TableHeader>
-        <TableRow className="bg-white hover:bg-white">
-          <TableHead>
-            <Button variant="ghost" className="h-7 rounded-md px-1 text-[11px]" onClick={onToggleSort}>
+        <TableRow className="bg-transparent hover:bg-transparent">
+          <TableHead className="text-cyan-300/70">
+            <Button variant="ghost" className="h-7 rounded-md px-1 text-[11px] text-cyan-300/70" onClick={onToggleSort}>
               Severity
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           </TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Detected</TableHead>
-          <TableHead>Confidence</TableHead>
-          <TableHead>Lane</TableHead>
+          <TableHead className="text-cyan-300/70">Status</TableHead>
+          <TableHead className="text-cyan-300/70">Detected</TableHead>
+          <TableHead className="text-cyan-300/70">Confidence</TableHead>
+          <TableHead className="text-cyan-300/70">Lane</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {events.map((event) => (
           <TableRow
             key={event.id}
-            className={selectedEventId === event.id ? "cursor-pointer bg-sky-50/80" : "cursor-pointer"}
+            className={selectedEventId === event.id ? "cursor-pointer bg-cyan-500/10 border-l-2 border-l-cyan-400" : "cursor-pointer"}
             onClick={() => onSelectEvent(event)}
             tabIndex={0}
             onKeyDown={(inputEvent) => {

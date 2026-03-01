@@ -122,8 +122,8 @@ export default function AdminUsersPage() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-lg font-semibold text-slate-900">User Administration</div>
-          <div className="text-sm text-slate-600">Manage `public.user_profiles` and control administrator access.</div>
+          <div className="text-lg font-semibold text-slate-100">User Administration</div>
+          <div className="text-sm text-slate-400">Manage `public.user_profiles` and control administrator access.</div>
         </div>
 
         <Button variant="outline" className="h-9 rounded-lg px-3 text-sm" onClick={() => void refreshUsers()}>
@@ -147,13 +147,13 @@ export default function AdminUsersPage() {
       >
         <Table>
           <TableHeader>
-            <TableRow className="bg-white hover:bg-white">
-              <TableHead>User</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead>Current Access</TableHead>
-              <TableHead>Change Access</TableHead>
-              <TableHead>Updated</TableHead>
-              <TableHead className="w-[160px]">Action</TableHead>
+            <TableRow className="bg-transparent hover:bg-transparent">
+              <TableHead className="text-cyan-300/70">User</TableHead>
+              <TableHead className="text-cyan-300/70">Email</TableHead>
+              <TableHead className="text-cyan-300/70">Current Access</TableHead>
+              <TableHead className="text-cyan-300/70">Change Access</TableHead>
+              <TableHead className="text-cyan-300/70">Updated</TableHead>
+              <TableHead className="w-[160px] text-cyan-300/70">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -166,8 +166,8 @@ export default function AdminUsersPage() {
                 <TableRow key={user.id}>
                   <TableCell>
                     <div className="space-y-1">
-                      <div className="font-medium text-slate-900">{user.full_name ?? "Unnamed User"}</div>
-                      <div className="text-xs text-slate-500">{user.id}</div>
+                      <div className="font-medium text-slate-100">{user.full_name ?? "Unnamed User"}</div>
+                      <div className="text-xs text-slate-400">{user.id}</div>
                     </div>
                   </TableCell>
                   <TableCell>{user.email ?? "No email"}</TableCell>
@@ -225,13 +225,13 @@ function StatCard({
   accent?: "admin" | "user";
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
-      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-slate-600">
-        {accent === "admin" ? <ShieldCheck className="h-4 w-4 text-blue-600" /> : null}
-        {accent === "user" ? <Shield className="h-4 w-4 text-slate-500" /> : null}
+    <div className="rounded-lg border border-white/10 bg-white/5 px-4 py-3">
+      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-cyan-300/70">
+        {accent === "admin" ? <ShieldCheck className="h-4 w-4 text-cyan-400" /> : null}
+        {accent === "user" ? <Shield className="h-4 w-4 text-slate-400" /> : null}
         <span>{label}</span>
       </div>
-      <div className="mt-1 text-xl font-semibold tabular-nums text-slate-900">{value}</div>
+      <div className="mt-1 text-xl font-semibold tabular-nums text-slate-100">{value}</div>
     </div>
   );
 }

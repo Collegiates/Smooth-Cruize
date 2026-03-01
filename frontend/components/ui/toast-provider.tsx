@@ -41,18 +41,18 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         {toasts.map((toast) => (
           <div
             key={toast.id}
-            className="pointer-events-auto flex items-start gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm"
+            className="pointer-events-auto flex items-start gap-3 rounded-lg border border-border bg-slate-900/95 p-3 shadow-panel"
             role="status"
             aria-live="polite"
           >
             {toast.variant === "error" ? (
-              <CircleAlert className="mt-0.5 h-4 w-4 text-rose-600" />
+              <CircleAlert className="mt-0.5 h-4 w-4 text-rose-300" />
             ) : (
-              <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-600" />
+              <CheckCircle2 className="mt-0.5 h-4 w-4 text-emerald-300" />
             )}
             <div className="min-w-0 flex-1">
-              <div className="text-sm font-medium text-gray-900">{toast.title}</div>
-              {toast.description ? <div className="mt-0.5 text-xs text-gray-600">{toast.description}</div> : null}
+              <div className="text-sm font-medium text-slate-100">{toast.title}</div>
+              {toast.description ? <div className="mt-0.5 text-xs text-slate-300">{toast.description}</div> : null}
             </div>
             <Button
               variant="ghost"

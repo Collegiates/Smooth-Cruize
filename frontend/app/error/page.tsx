@@ -8,12 +8,12 @@ export default async function ErrorPage({
     const { message } = await searchParams
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-            <div className="w-full max-w-md rounded-2xl border border-red-200 bg-white p-8 text-center shadow-lg">
-                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
+        <div className="flex min-h-screen items-center justify-center bg-transparent p-4">
+            <div className="w-full max-w-md rounded-2xl border border-rose-300/30 bg-slate-900/75 p-8 text-center shadow-panel backdrop-blur">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-rose-500/20">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
-                        className="h-8 w-8 text-red-600"
+                        className="h-8 w-8 text-rose-300"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -26,10 +26,10 @@ export default async function ErrorPage({
                         />
                     </svg>
                 </div>
-                <h1 className="mb-2 text-2xl font-bold text-gray-900">
+                <h1 className="mb-2 text-2xl font-bold text-slate-100">
                     Something went wrong
                 </h1>
-                <p className="mb-6 text-sm text-gray-600">
+                <p className="mb-6 text-sm text-slate-300">
                     {message || 'An unexpected error occurred. Please try again.'}
                 </p>
                 <Link

@@ -123,14 +123,14 @@ export function WorkOrderDetail({ event, onUpdated, compact = false }: WorkOrder
         <MetadataTile label="ID" value={event.id.slice(0, 8)} />
         <MetadataTile label="GPS" value={formatCoordinates(event.latitude, event.longitude)} />
         <MetadataTile label="Detected At" value={formatDateTime(event.detected_at)} />
-        <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
-          <div className="text-xs uppercase tracking-wide text-gray-500">Severity</div>
+        <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+          <div className="text-xs uppercase tracking-wide text-cyan-300/70">Severity</div>
           <div className="mt-2">
             <SeverityBadge severity={event.severity} />
           </div>
         </div>
-        <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
-          <div className="text-xs uppercase tracking-wide text-gray-500">Status</div>
+        <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+          <div className="text-xs uppercase tracking-wide text-cyan-300/70">Status</div>
           <div className="mt-2">
             <StatusBadge status={event.status} />
           </div>
@@ -140,7 +140,7 @@ export function WorkOrderDetail({ event, onUpdated, compact = false }: WorkOrder
       <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-4">
           <Widget title="Clip Evidence" subtitle="Source video snippet" maxBodyHeight="none" bodyClassName="p-4">
-            <video controls poster={event.thumbnail_url} className="rounded-lg border border-gray-200">
+            <video controls poster={event.thumbnail_url} className="rounded-lg border border-white/10">
               <source src={event.clip_url} />
             </video>
           </Widget>
@@ -159,12 +159,12 @@ export function WorkOrderDetail({ event, onUpdated, compact = false }: WorkOrder
               {timeline.map((item, index) => (
                 <div key={item.label} className="relative flex gap-3">
                   <div className="flex flex-col items-center">
-                    <div className={`h-3 w-3 rounded-full ${item.complete ? "bg-sky-600" : "bg-gray-300"}`} />
-                    {index < timeline.length - 1 ? <div className="mt-1 h-10 w-px bg-gray-200" /> : null}
+                    <div className={`h-3 w-3 rounded-full ${item.complete ? "bg-cyan-400" : "bg-slate-700"}`} />
+                    {index < timeline.length - 1 ? <div className="mt-1 h-10 w-px bg-white/10" /> : null}
                   </div>
                   <div className="pb-2">
-                    <div className="text-sm font-medium text-gray-900">{item.label}</div>
-                    <div className="text-sm text-gray-500">{item.detail}</div>
+                    <div className="text-sm font-medium text-slate-100">{item.label}</div>
+                    <div className="text-sm text-slate-400">{item.detail}</div>
                   </div>
                 </div>
               ))}
@@ -176,9 +176,9 @@ export function WorkOrderDetail({ event, onUpdated, compact = false }: WorkOrder
           <form className="space-y-4" onSubmit={handleSubmit}>
             <div className="grid gap-4 md:grid-cols-2">
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase tracking-wide text-gray-500">Status</Label>
+                <Label className="text-xs uppercase tracking-wide text-cyan-300/70">Status</Label>
                 <Select value={form.watch("status")} onValueChange={(value) => form.setValue("status", value as PotholeEvent["status"])}>
-                  <SelectTrigger className="h-9 rounded-lg border-gray-200 text-sm">
+                  <SelectTrigger className="h-9 rounded-lg border-white/10 bg-slate-800 text-slate-100 text-sm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -192,21 +192,21 @@ export function WorkOrderDetail({ event, onUpdated, compact = false }: WorkOrder
               </div>
 
               <div className="space-y-1.5">
-                <Label className="text-xs uppercase tracking-wide text-gray-500">Severity</Label>
-                <Input className="h-9 rounded-lg border-gray-200 text-sm" type="number" min={1} max={10} {...form.register("severity")} />
+                <Label className="text-xs uppercase tracking-wide text-cyan-300/70">Severity</Label>
+                <Input className="h-9 rounded-lg border-white/10 bg-slate-800 text-slate-100 text-sm" type="number" min={1} max={10} {...form.register("severity")} />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase tracking-wide text-gray-500">Assigned To</Label>
-              <Input className="h-9 rounded-lg border-gray-200 text-sm" placeholder="Crew or assignee" {...form.register("assigned_to")} />
+              <Label className="text-xs uppercase tracking-wide text-cyan-300/70">Assigned To</Label>
+              <Input className="h-9 rounded-lg border-white/10 bg-slate-800 text-slate-100 text-sm" placeholder="Crew or assignee" {...form.register("assigned_to")} />
             </div>
 
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <div className="rounded-lg border border-cyan-400/20 bg-cyan-500/5 p-4">
               <div className="flex items-center justify-between gap-3">
                 <div>
-                  <div className="text-xs font-semibold uppercase tracking-wide text-gray-500">AI Draft</div>
-                  <div className="mt-1 text-sm text-gray-700">{event.description_ai ?? "No AI draft available."}</div>
+                  <div className="text-xs font-semibold uppercase tracking-wide text-cyan-400/80">AI Draft</div>
+                  <div className="mt-1 text-sm text-slate-300">{event.description_ai ?? "No AI draft available."}</div>
                 </div>
                 <Button type="button" variant="outline" className="h-9 rounded-lg px-3 text-sm" onClick={approveDescription}>
                   Use as notes
@@ -215,9 +215,9 @@ export function WorkOrderDetail({ event, onUpdated, compact = false }: WorkOrder
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-xs uppercase tracking-wide text-gray-500">Notes</Label>
+              <Label className="text-xs uppercase tracking-wide text-cyan-300/70">Notes</Label>
               <Textarea
-                className="min-h-[220px] rounded-lg border-gray-200 text-sm"
+                className="min-h-[220px] rounded-lg border-white/10 bg-slate-800 text-slate-100 text-sm"
                 placeholder="Maintenance notes, dispatcher updates, and resolution comments."
                 {...form.register("notes_admin")}
               />
@@ -245,7 +245,7 @@ export function WorkOrderDetail({ event, onUpdated, compact = false }: WorkOrder
       </div>
 
       <Dialog open={resolveConfirmOpen} onOpenChange={setResolveConfirmOpen}>
-        <DialogContent className="rounded-lg border-gray-200 bg-white">
+        <DialogContent className="rounded-lg border-white/10 bg-slate-900 text-slate-100">
           <DialogHeader>
             <DialogTitle>Confirm Resolution</DialogTitle>
             <DialogDescription>
@@ -268,9 +268,9 @@ export function WorkOrderDetail({ event, onUpdated, compact = false }: WorkOrder
 
 function MetadataTile({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
-      <div className="text-xs uppercase tracking-wide text-gray-500">{label}</div>
-      <div className="mt-1 text-sm font-medium text-gray-900">{value}</div>
+    <div className="rounded-lg border border-white/10 bg-white/5 p-3">
+      <div className="text-xs uppercase tracking-wide text-cyan-300/70">{label}</div>
+      <div className="mt-1 text-sm font-medium text-slate-100">{value}</div>
     </div>
   );
 }

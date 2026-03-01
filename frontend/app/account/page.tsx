@@ -54,7 +54,7 @@ export default function AccountPage() {
     <AppShell title="Account" subtitle="Current session, role, and sign-out controls." navGroups={publicNavGroups}>
       {isLoading || isProfileLoading ? (
         <Card className="max-w-2xl">
-          <CardContent className="p-8 text-center text-sm text-gray-500">
+          <CardContent className="p-8 text-center text-sm text-slate-300">
             Loading account...
           </CardContent>
         </Card>
