@@ -6,7 +6,7 @@ import { createContext, useContext, useEffect, useState } from "react"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 type SupabaseContext = {
-    supabase: SupabaseClient
+    supabase: SupabaseClient | undefined
     googleMapsApiKey: string
 }
 
@@ -23,12 +23,28 @@ export default function SupabaseProvider({
     supabaseAnonKey: string
     googleMapsApiKey: string
 }) {
-    const [supabase] = useState(() =>
-        createBrowserClient(supabaseUrl, supabaseAnonKey)
+    const hasValidSupabaseConfig = Boolean(
+        supabaseUrl && supabaseAnonKey && supabaseAnonKey.startsWith("eyJ")
     )
+
+    const [supabase] = useState<SupabaseClient | undefined>(() => {
+        if (!hasValidSupabaseConfig) {
+            return undefined
+        }
+
+        try {
+            return createBrowserClient(supabaseUrl, supabaseAnonKey)
+        } catch {
+            return undefined
+        }
+    })
     const router = useRouter()
 
     useEffect(() => {
+        if (!supabase) {
+            return
+        }
+
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange(() => {

@@ -23,7 +23,7 @@ export default function AccountPage() {
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!session?.user.id) {
+      if (!session?.user.id || !supabase) {
         setProfile(session?.profile ?? null);
         return;
       }
