@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { RefreshCw, Shield, ShieldCheck } from "lucide-react";
 
-import { useSupabase } from "@/components/supabase-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +27,6 @@ import { getUserProfiles, updateUserProfileAdmin, type UserProfileRecord } from 
 import { formatDateTime } from "@/lib/utils";
 
 export default function AdminUsersPage() {
-  const supabase = useSupabase();
   const { session } = useSession();
   const { pushToast } = useToast();
   const [users, setUsers] = useState<UserProfileRecord[]>([]);
@@ -40,7 +38,7 @@ export default function AdminUsersPage() {
     setLoading(true);
 
     try {
-      const nextUsers = await getUserProfiles(supabase);
+      const nextUsers = await getUserProfiles();
       setUsers(nextUsers);
       setPendingValues(
         Object.fromEntries(nextUsers.map((user) => [user.id, user.is_admin ? "admin" : "user"]))
@@ -59,7 +57,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     void refreshUsers();
-  }, [supabase]);
+  }, []);
 
   const stats = useMemo(() => {
     const adminCount = users.filter((user) => user.is_admin).length;
@@ -94,7 +92,7 @@ export default function AdminUsersPage() {
     setSavingUserId(user.id);
 
     try {
-      const updated = await updateUserProfileAdmin(user.id, nextIsAdmin, supabase);
+      const updated = await updateUserProfileAdmin(user.id, nextIsAdmin);
       setUsers((current) => current.map((item) => (item.id === user.id ? updated : item)));
       setPendingValues((current) => ({
         ...current,
@@ -108,7 +106,7 @@ export default function AdminUsersPage() {
       console.error("Failed to update user:", error);
       pushToast({
         title: "Failed to update user",
-        description: "The database rejected the change. Confirm your user_profiles RLS policies.",
+        description: "The backend rejected the change. Confirm the backend Supabase credentials and policies.",
         variant: "error"
       });
       setPendingValues((current) => ({
