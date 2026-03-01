@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Download, RefreshCw } from "lucide-react";
 
 import { DailyPotholeChart } from "@/components/charts/DailyPotholeChart";
@@ -33,6 +34,7 @@ function sortEvents(events: PotholeEvent[], sortDescending: boolean) {
 export default function AdminDashboardPage() {
   const { pushToast } = useToast();
   const supabase = useSupabase();
+  const router = useRouter();
   const [filters, setFilters] = useState<EventFilters>(initialFilters);
   const [events, setEvents] = useState<PotholeEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -166,7 +168,9 @@ export default function AdminDashboardPage() {
           >
             <WorkOrdersTable
               events={events}
-              onSelectEvent={() => undefined}
+              onSelectEvent={(event) => {
+                router.push(`/admin/work-orders/${event.id}`);
+              }}
               sortDescending={sortDescending}
               onToggleSort={() => setSortDescending((value) => !value)}
             />

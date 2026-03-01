@@ -19,7 +19,11 @@ export function formatDateTime(value?: string | null) {
   return format(new Date(value), "MMM d, yyyy h:mm a");
 }
 
-export function formatConfidence(value: number) {
+export function formatConfidence(value?: number | null) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return "N/A";
+  }
+
   return `${Math.round(value * 100)}%`;
 }
 

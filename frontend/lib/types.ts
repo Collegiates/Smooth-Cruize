@@ -19,7 +19,7 @@ export type PotholeEvent = {
   longitude: number;
   detected_at: string;
   severity: number;
-  confidence: number;
+  confidence?: number | null;
   status: PotholeStatus;
   lane_position?: LanePosition;
   description_ai?: string;

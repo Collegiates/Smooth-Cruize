@@ -3,7 +3,7 @@
 import { ArrowUpDown } from "lucide-react";
 
 import type { PotholeEvent, PotholeStatus } from "@/lib/types";
-import { formatConfidence, formatDateTime } from "@/lib/utils";
+import { formatDateTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -46,7 +46,6 @@ export function WorkOrdersTable({
           </TableHead>
           <TableHead className="text-cyan-300/70">Status</TableHead>
           <TableHead className="text-cyan-300/70">Detected</TableHead>
-          <TableHead className="text-cyan-300/70">Confidence</TableHead>
           <TableHead className="text-cyan-300/70">Lane</TableHead>
         </TableRow>
       </TableHeader>
@@ -74,7 +73,6 @@ export function WorkOrdersTable({
               <StatusBadge status={event.status} />
             </TableCell>
             <TableCell>{formatDateTime(event.detected_at)}</TableCell>
-            <TableCell>{formatConfidence(event.confidence)}</TableCell>
             <TableCell className="capitalize">{event.lane_position ?? "unknown"}</TableCell>
           </TableRow>
         ))}

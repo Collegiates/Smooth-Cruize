@@ -28,8 +28,13 @@ function normalizeSeverity(record: Record<string, unknown>) {
     }
   }
 
-  const confidence = typeof record.confidence === "number" && Number.isFinite(record.confidence) ? record.confidence : 0.65;
-  return clampSeverity(confidence <= 1 ? confidence * 10 : confidence);
+  const confidence = typeof record.confidence === "number" && Number.isFinite(record.confidence) ? record.confidence : null;
+
+  if (confidence !== null) {
+    return clampSeverity(confidence <= 1 ? confidence * 10 : confidence);
+  }
+
+  return 5;
 }
 
 function normalizeEvent(record: Record<string, unknown>): PotholeEvent {
@@ -50,7 +55,7 @@ function normalizeEvent(record: Record<string, unknown>): PotholeEvent {
         ? record.detected_at
         : createdAt,
     severity: normalizeSeverity(record),
-    confidence: typeof record.confidence === "number" && Number.isFinite(record.confidence) ? record.confidence : 0.65,
+    confidence: typeof record.confidence === "number" && Number.isFinite(record.confidence) ? record.confidence : null,
     status:
       typeof record.status === "string" &&
         ["open", "assigned", "in_progress", "resolved", "rejected"].includes(record.status)
@@ -274,7 +279,7 @@ export async function createPotholeEvent(
     id: crypto.randomUUID(),
     created_at: new Date().toISOString(),
     lane_position: "unknown",
-    confidence: 0.65,
+    confidence: null,
     notes_admin: "",
     assigned_to: "",
     description_ai: "",
