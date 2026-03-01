@@ -151,53 +151,56 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="space-y-4">
+        <div className="grid gap-4 xl:grid-cols-2">
+          <Widget
+            title="Work Orders Inbox"
+            subtitle="Prioritized by severity"
+            onRefresh={() => void refreshEvents()}
+            loading={loading}
+            emptyState="No work orders match the current filters."
+            footer={<span>{events.length} visible work orders</span>}
+            maxBodyHeight="420px"
+          >
+            <WorkOrdersTable
+              events={events}
+              onSelectEvent={() => undefined}
+              sortDescending={sortDescending}
+              onToggleSort={() => setSortDescending((value) => !value)}
+            />
+          </Widget>
+
+          <Widget title="Maintenance Status Overview" subtitle="Current workflow mix" maxBodyHeight="420px">
+            <div className="p-4">
+              <StatusChart />
+            </div>
+          </Widget>
+        </div>
+
         <Widget
           title="Daily Pothole Activity"
           subtitle="Reported vs resolved over the last 14 days"
           onRefresh={() => void refreshEvents()}
           loading={analyticsLoading}
           emptyState="No activity available for the last 14 days."
-          className="xl:col-span-2"
           maxBodyHeight="none"
         >
           <DailyPotholeChart data={dailyStats} summary={dailySummary} loading={analyticsLoading} />
         </Widget>
 
-        <Widget
-          title="Work Orders Inbox"
-          subtitle="Prioritized by severity"
-          onRefresh={() => void refreshEvents()}
-          loading={loading}
-          emptyState="No work orders match the current filters."
-          footer={<span>{events.length} visible work orders</span>}
-          maxBodyHeight="420px"
-        >
-          <WorkOrdersTable
-            events={events}
-            onSelectEvent={() => undefined}
-            sortDescending={sortDescending}
-            onToggleSort={() => setSortDescending((value) => !value)}
-          />
-        </Widget>
+        <div className="grid gap-4 xl:grid-cols-2">
+          <Widget title="Detections by Month" subtitle="Rolling trend" maxBodyHeight="420px">
+            <div className="p-4">
+              <MonthlyBars />
+            </div>
+          </Widget>
 
-        <Widget title="Maintenance Status Overview" subtitle="Current workflow mix" maxBodyHeight="420px">
-          <div className="p-4">
-            <StatusChart />
-          </div>
-        </Widget>
-
-        <Widget title="Detections by Month" subtitle="Rolling trend" maxBodyHeight="420px">
-          <div className="p-4">
-            <MonthlyBars />
-          </div>
-        </Widget>
-
-        <Widget title="Services In Process" subtitle="Crew distribution" maxBodyHeight="420px">
-          <div className="p-4">
-            <ServicesDonut />
-          </div>
-        </Widget>
+          <Widget title="Services In Process" subtitle="Crew distribution" maxBodyHeight="420px">
+            <div className="p-4">
+              <ServicesDonut />
+            </div>
+          </Widget>
+        </div>
       </div>
     </div>
   );
