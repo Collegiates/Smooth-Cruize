@@ -32,6 +32,13 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 ```
 
+
+2.5 installing supabase
+
+```bash
+npm install @supabase/supabase-js @supabase/ssr
+```
+
 3. Start the dev server:
 
 ```bash
