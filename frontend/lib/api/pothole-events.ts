@@ -7,6 +7,68 @@ import { readLocalStorage, storageKeys, writeLocalStorage } from "@/lib/storage"
 import type { DashboardMetrics, EventFilters, PotholeEvent } from "@/lib/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+function clampSeverity(value: number) {
+  return Math.max(1, Math.min(10, Math.round(value)));
+}
+
+function normalizeSeverity(record: Record<string, unknown>) {
+  const directSeverity = record.severity;
+
+  if (typeof directSeverity === "number" && Number.isFinite(directSeverity)) {
+    return clampSeverity(directSeverity);
+  }
+
+  const candidateKeys = ["priority", "priority_score", "risk_score", "damage_score", "score", "rating"];
+
+  for (const key of candidateKeys) {
+    const value = record[key];
+
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return clampSeverity(value <= 1 ? value * 10 : value);
+    }
+  }
+
+  const confidence = typeof record.confidence === "number" && Number.isFinite(record.confidence) ? record.confidence : 0.65;
+  return clampSeverity(confidence <= 1 ? confidence * 10 : confidence);
+}
+
+function normalizeEvent(record: Record<string, unknown>): PotholeEvent {
+  const createdAt =
+    typeof record.created_at === "string"
+      ? record.created_at
+      : typeof record.detected_at === "string"
+        ? record.detected_at
+        : new Date().toISOString();
+
+  return {
+    id: typeof record.id === "string" ? record.id : crypto.randomUUID(),
+    created_at: createdAt,
+    latitude: typeof record.latitude === "number" ? record.latitude : 0,
+    longitude: typeof record.longitude === "number" ? record.longitude : 0,
+    detected_at:
+      typeof record.detected_at === "string"
+        ? record.detected_at
+        : createdAt,
+    severity: normalizeSeverity(record),
+    confidence: typeof record.confidence === "number" && Number.isFinite(record.confidence) ? record.confidence : 0.65,
+    status:
+      typeof record.status === "string" &&
+      ["open", "assigned", "in_progress", "resolved", "rejected"].includes(record.status)
+        ? (record.status as PotholeEvent["status"])
+        : "open",
+    lane_position:
+      typeof record.lane_position === "string" &&
+      ["left", "center", "right", "unknown"].includes(record.lane_position)
+        ? (record.lane_position as PotholeEvent["lane_position"])
+        : "unknown",
+    description_ai: typeof record.description_ai === "string" ? record.description_ai : "",
+    notes_admin: typeof record.notes_admin === "string" ? record.notes_admin : "",
+    assigned_to: typeof record.assigned_to === "string" ? record.assigned_to : "",
+    clip_url: typeof record.clip_url === "string" ? record.clip_url : "",
+    thumbnail_url: typeof record.thumbnail_url === "string" ? record.thumbnail_url : ""
+  };
+}
+
 function getMockEventsStore() {
   const storedVersion = readLocalStorage<number>(storageKeys.mockEventsVersionKey, 0);
   const stored = readLocalStorage<PotholeEvent[]>(storageKeys.mockEventsKey, []);
@@ -52,22 +114,18 @@ function applyFilters(events: PotholeEvent[], filters?: EventFilters) {
 
 export async function getPotholeEvents(filters?: EventFilters, supabase?: SupabaseClient): Promise<PotholeEvent[]> {
   if (supabase) {
-    let query = supabase.from("pothole_events").select("*").order("severity", { ascending: false });
+    let query = supabase.from("pothole_events").select("*").order("created_at", { ascending: false });
 
     if (filters?.status && filters.status !== "all") {
       query = query.eq("status", filters.status);
     }
 
-    if (filters?.severityRange) {
-      query = query.gte("severity", filters.severityRange[0]).lte("severity", filters.severityRange[1]);
-    }
-
     if (filters?.dateFrom) {
-      query = query.gte("detected_at", filters.dateFrom);
+      query = query.gte("created_at", filters.dateFrom);
     }
 
     if (filters?.dateTo) {
-      query = query.lte("detected_at", filters.dateTo);
+      query = query.lte("created_at", filters.dateTo);
     }
 
     const { data, error } = await query;
@@ -77,7 +135,9 @@ export async function getPotholeEvents(filters?: EventFilters, supabase?: Supaba
       throw new Error(error.message || "Failed to fetch pothole events");
     }
 
-    return (data as PotholeEvent[]) ?? [];
+    return applyFilters(((data as Record<string, unknown>[] | null) ?? []).map(normalizeEvent), filters).sort(
+      (a, b) => b.severity - a.severity
+    );
   }
 
   const events = getMockEventsStore();
@@ -92,7 +152,7 @@ export async function getPotholeEventById(id: string, supabase?: SupabaseClient)
       throw error;
     }
 
-    return data as PotholeEvent;
+    return normalizeEvent((data as Record<string, unknown>) ?? {});
   }
 
   return getMockEventsStore().find((event) => event.id === id) ?? null;
@@ -115,7 +175,7 @@ export async function updatePotholeEvent(
       throw error;
     }
 
-    return data as PotholeEvent;
+    return normalizeEvent((data as Record<string, unknown>) ?? {});
   }
 
   const events = getMockEventsStore();
@@ -154,7 +214,7 @@ export async function createPotholeEvent(
       throw error;
     }
 
-    return data as PotholeEvent;
+    return normalizeEvent((data as Record<string, unknown>) ?? {});
   }
 
   const events = [draft, ...getMockEventsStore()];

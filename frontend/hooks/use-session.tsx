@@ -2,8 +2,8 @@
 
 import { createContext, useContext, useEffect, useState } from "react";
 
+import { useSupabase } from "@/components/supabase-provider";
 import { getCurrentSession, loginAsDemo, loginWithPassword, logout } from "@/lib/auth";
-import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
 
 import type { AppSession, UserRole } from "@/lib/types";
 
@@ -39,12 +39,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const hydrateSession = async () => {
       setIsLoading(true);
-<<<<<<< HEAD:hooks/use-session.tsx
       try {
-        const nextSession = await getCurrentSession();
+        const nextSession = await getCurrentSession(supabase);
         setSession(nextSession);
       } catch (error) {
-        // This catches the [object Object] error instead of crashing the app
         console.error("Failed to hydrate session:", error);
         setSession(null);
       } finally {
@@ -53,16 +51,6 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     };
 
     void hydrateSession();
-
-    if (!hasSupabaseEnv()) {
-      return;
-    }
-
-    const supabase = getSupabaseBrowserClient();
-
-    if (!supabase) {
-      return;
-    }
 
     const {
       data: { subscription }
@@ -73,16 +61,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, []);
-=======
-      const nextSession = await getCurrentSession(supabase);
-      setSession(nextSession);
-      setIsLoading(false);
-    };
-
-    void hydrateSession();
   }, [supabase]);
->>>>>>> tbranch3:frontend/hooks/use-session.tsx
 
   const value: SessionContextValue = {
     session,

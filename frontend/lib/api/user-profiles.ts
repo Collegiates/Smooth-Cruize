@@ -1,6 +1,7 @@
 "use client";
 
 import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type UserProfileRecord = {
   id: string;
@@ -30,18 +31,18 @@ const demoProfiles: UserProfileRecord[] = [
   }
 ];
 
-export async function getUserProfiles(): Promise<UserProfileRecord[]> {
+export async function getUserProfiles(supabase?: SupabaseClient): Promise<UserProfileRecord[]> {
   if (!hasSupabaseEnv()) {
     return demoProfiles;
   }
 
-  const supabase = getSupabaseBrowserClient();
+  const client = supabase ?? getSupabaseBrowserClient();
 
-  if (!supabase) {
+  if (!client) {
     return [];
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("user_profiles")
     .select("id, email, full_name, is_admin, created_at, updated_at")
     .order("created_at", { ascending: false });
@@ -53,7 +54,7 @@ export async function getUserProfiles(): Promise<UserProfileRecord[]> {
   return (data as UserProfileRecord[]) ?? [];
 }
 
-export async function updateUserProfileAdmin(id: string, isAdmin: boolean): Promise<UserProfileRecord> {
+export async function updateUserProfileAdmin(id: string, isAdmin: boolean, supabase?: SupabaseClient): Promise<UserProfileRecord> {
   if (!hasSupabaseEnv()) {
     const profile = demoProfiles.find((item) => item.id === id);
 
@@ -66,13 +67,13 @@ export async function updateUserProfileAdmin(id: string, isAdmin: boolean): Prom
     return profile;
   }
 
-  const supabase = getSupabaseBrowserClient();
+  const client = supabase ?? getSupabaseBrowserClient();
 
-  if (!supabase) {
+  if (!client) {
     throw new Error("Supabase client unavailable.");
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("user_profiles")
     .update({ is_admin: isAdmin })
     .eq("id", id)

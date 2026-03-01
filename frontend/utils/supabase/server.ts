@@ -17,8 +17,20 @@ export type ConfigResult =
     }
 
 async function getSupabaseConfig(): Promise<ConfigResult> {
+    const localConfig = {
+        NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
+        NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    }
+
+    if (localConfig.NEXT_PUBLIC_SUPABASE_URL && localConfig.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+        return {
+            success: true,
+            config: localConfig,
+        }
+    }
+
     try {
-        // Assuming backend runs on 8000
         const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
         const res = await fetch(`${apiUrl}/api/env`, {
@@ -43,6 +55,12 @@ async function getSupabaseConfig(): Promise<ConfigResult> {
         const data = await res.json()
 
         if (!data.NEXT_PUBLIC_SUPABASE_URL || !data.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+            if (localConfig.NEXT_PUBLIC_SUPABASE_URL && localConfig.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+                return {
+                    success: true,
+                    config: localConfig,
+                }
+            }
             return {
                 success: false,
                 error: "Backend is missing Supabase environment variables. Check backend/.env file.",
@@ -59,7 +77,6 @@ async function getSupabaseConfig(): Promise<ConfigResult> {
             },
         }
     } catch (error) {
-        console.error("Error fetching Supabase config:", error)
         return {
             success: false,
             error: error instanceof Error ? error.message : "Unknown error occurred",

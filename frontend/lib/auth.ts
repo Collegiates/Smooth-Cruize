@@ -5,7 +5,6 @@ import { readLocalStorage, storageKeys, writeLocalStorage } from "@/lib/storage"
 import type { AppSession, Profile, UserRole } from "@/lib/types";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-<<<<<<< HEAD:lib/auth.ts
 function buildSessionProfile({
   id,
   email,
@@ -25,25 +24,12 @@ function buildSessionProfile({
   };
 }
 
-export async function getCurrentSession(): Promise<AppSession | null> {
-  if (hasSupabaseEnv()) {
-    const supabase = getSupabaseBrowserClient();
-
-    if (!supabase) {
-      return null;
-    }
-
+export async function getCurrentSession(supabase?: SupabaseClient): Promise<AppSession | null> {
+  if (supabase) {
     try {
       const {
         data: { session }
       } = await supabase.auth.getSession();
-=======
-export async function getCurrentSession(supabase?: SupabaseClient): Promise<AppSession | null> {
-  if (supabase) {
-    const {
-      data: { session }
-    } = await supabase.auth.getSession();
->>>>>>> tbranch3:frontend/lib/auth.ts
 
       if (!session?.user) {
         return null;
