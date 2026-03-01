@@ -1,4 +1,5 @@
 const mockEventsKey = "cmms.mock.events";
+const mockEventsVersionKey = "cmms.mock.events.version";
 const mockSessionKey = "cmms.mock.session";
 
 export function isBrowser() {
@@ -33,5 +34,6 @@ export function writeLocalStorage<T>(key: string, value: T) {
 
 export const storageKeys = {
   mockEventsKey,
+  mockEventsVersionKey,
   mockSessionKey
 };

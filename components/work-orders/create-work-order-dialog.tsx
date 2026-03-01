@@ -35,8 +35,8 @@ export function CreateWorkOrderDialog({ onCreated }: CreateWorkOrderDialogProps)
   const form = useForm<z.infer<typeof createWorkOrderSchema>>({
     resolver: zodResolver(createWorkOrderSchema),
     defaultValues: {
-      latitude: 40.744,
-      longitude: -73.987,
+      latitude: 39.6808,
+      longitude: -75.7545,
       severity: 5,
       clip_url: "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4"
     }

@@ -1,11 +1,13 @@
 import type { AppSession, PotholeEvent } from "@/lib/types";
 
+export const mockEventsVersion = 2;
+
 export const mockEvents: PotholeEvent[] = [
   {
     id: "2c8d9dc2-39ab-4359-8303-c7f72a83c701",
     created_at: "2026-02-28T13:04:00.000Z",
-    latitude: 40.74124,
-    longitude: -73.98968,
+    latitude: 39.6808,
+    longitude: -75.7545,
     detected_at: "2026-02-28T13:02:20.000Z",
     severity: 8,
     confidence: 0.93,
@@ -20,8 +22,8 @@ export const mockEvents: PotholeEvent[] = [
   {
     id: "a0d7ae1c-d7f0-44df-99bf-ccefd31d9d9f",
     created_at: "2026-02-28T11:22:00.000Z",
-    latitude: 40.74891,
-    longitude: -73.96818,
+    latitude: 39.6816,
+    longitude: -75.7531,
     detected_at: "2026-02-28T11:20:12.000Z",
     severity: 6,
     confidence: 0.81,
@@ -36,8 +38,8 @@ export const mockEvents: PotholeEvent[] = [
   {
     id: "0fccfd6d-2411-4650-8439-7f951688810a",
     created_at: "2026-02-28T08:51:00.000Z",
-    latitude: 40.72911,
-    longitude: -73.99734,
+    latitude: 39.6822,
+    longitude: -75.7524,
     detected_at: "2026-02-28T08:50:03.000Z",
     severity: 4,
     confidence: 0.72,
@@ -52,8 +54,8 @@ export const mockEvents: PotholeEvent[] = [
   {
     id: "ef1fdbf2-b5f7-4dba-b192-479568c984d8",
     created_at: "2026-02-27T23:20:00.000Z",
-    latitude: 40.75644,
-    longitude: -73.98695,
+    latitude: 39.6799,
+    longitude: -75.7552,
     detected_at: "2026-02-27T23:18:31.000Z",
     severity: 9,
     confidence: 0.97,
@@ -68,8 +70,8 @@ export const mockEvents: PotholeEvent[] = [
   {
     id: "e0c13397-24df-4a54-a937-0b37137b447d",
     created_at: "2026-02-27T18:12:00.000Z",
-    latitude: 40.72177,
-    longitude: -74.00492,
+    latitude: 39.6811,
+    longitude: -75.7518,
     detected_at: "2026-02-27T18:11:20.000Z",
     severity: 5,
     confidence: 0.76,
@@ -84,8 +86,8 @@ export const mockEvents: PotholeEvent[] = [
   {
     id: "cf2031e0-dfc7-4142-ae66-8d95c4313cf1",
     created_at: "2026-02-28T14:30:00.000Z",
-    latitude: 40.76247,
-    longitude: -73.97594,
+    latitude: 39.6802,
+    longitude: -75.7537,
     detected_at: "2026-02-28T14:28:44.000Z",
     severity: 7,
     confidence: 0.88,

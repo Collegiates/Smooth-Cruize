@@ -22,8 +22,8 @@ const mapContainerStyle = {
 };
 
 const defaultCenter = {
-  lat: 40.74124,
-  lng: -73.98968
+  lat: 39.6812,
+  lng: -75.7536
 };
 
 export function PotholeMap({

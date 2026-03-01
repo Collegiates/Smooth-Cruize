@@ -3,23 +3,26 @@
 import { subHours } from "date-fns";
 
 import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
-import { mockEvents } from "@/lib/mock/pothole-events";
+import { mockEvents, mockEventsVersion } from "@/lib/mock/pothole-events";
 import { readLocalStorage, storageKeys, writeLocalStorage } from "@/lib/storage";
 import type { DashboardMetrics, EventFilters, PotholeEvent } from "@/lib/types";
 
 function getMockEventsStore() {
+  const storedVersion = readLocalStorage<number>(storageKeys.mockEventsVersionKey, 0);
   const stored = readLocalStorage<PotholeEvent[]>(storageKeys.mockEventsKey, []);
 
-  if (stored.length > 0) {
+  if (stored.length > 0 && storedVersion === mockEventsVersion) {
     return stored;
   }
 
   writeLocalStorage(storageKeys.mockEventsKey, mockEvents);
+  writeLocalStorage(storageKeys.mockEventsVersionKey, mockEventsVersion);
   return mockEvents;
 }
 
 function setMockEventsStore(events: PotholeEvent[]) {
   writeLocalStorage(storageKeys.mockEventsKey, events);
+  writeLocalStorage(storageKeys.mockEventsVersionKey, mockEventsVersion);
 }
 
 function applyFilters(events: PotholeEvent[], filters?: EventFilters) {
