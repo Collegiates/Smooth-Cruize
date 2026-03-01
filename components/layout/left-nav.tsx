@@ -8,6 +8,7 @@ import {
   ClipboardList,
   LayoutDashboard,
   LogIn,
+  LogOut,
   Map,
   PanelLeftClose,
   PanelLeftOpen,
@@ -43,7 +44,8 @@ const iconMap: Record<NavIconName, ComponentType<{ className?: string }>> = {
   "bar-chart-3": BarChart3,
   settings: Settings,
   "user-circle-2": UserCircle2,
-  "log-in": LogIn
+  "log-in": LogIn,
+  "log-out": LogOut
 };
 
 export function LeftNav({

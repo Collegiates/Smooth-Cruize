@@ -13,32 +13,44 @@ export async function getCurrentSession(): Promise<AppSession | null> {
       return null;
     }
 
-    const {
-      data: { session }
-    } = await supabase.auth.getSession();
+    try {
+      const {
+        data: { session }
+      } = await supabase.auth.getSession();
 
-    if (!session?.user) {
-      return null;
+      if (!session?.user) {
+        return null;
+      }
+
+      // Try to fetch profile from profiles table; fall back to auth user data
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("id, role, display_name")
+        .eq("id", session.user.id)
+        .single();
+
+      const resolvedProfile: Profile = profile
+        ? (profile as Profile)
+        : {
+          id: session.user.id,
+          role: "user" as const,
+          display_name:
+            session.user.user_metadata?.full_name ??
+            session.user.email?.split("@")[0] ??
+            "User"
+        };
+
+      return {
+        user: {
+          id: session.user.id,
+          email: session.user.email ?? "unknown@example.com"
+        },
+        profile: resolvedProfile,
+        source: "supabase"
+      };
+    } catch {
+      // If Supabase calls fail, fall through to demo mode
     }
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id, role, display_name")
-      .eq("id", session.user.id)
-      .single();
-
-    if (!profile) {
-      return null;
-    }
-
-    return {
-      user: {
-        id: session.user.id,
-        email: session.user.email ?? "unknown@example.com"
-      },
-      profile: profile as Profile,
-      source: "supabase"
-    };
   }
 
   return readLocalStorage<AppSession | null>(storageKeys.mockSessionKey, null);

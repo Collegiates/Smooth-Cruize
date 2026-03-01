@@ -62,7 +62,11 @@ export function AppShell({ title, subtitle, breadcrumbs, navGroups = [], childre
   const filteredGroups = navGroups
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => !item.adminOnly || session?.profile.role === "admin")
+      items: group.items.filter((item) => {
+        if (item.adminOnly && session?.profile.role !== "admin") return false;
+        if ("guestOnly" in item && item.guestOnly && session) return false;
+        return true;
+      })
     }))
     .filter((group) => group.items.length > 0);
 

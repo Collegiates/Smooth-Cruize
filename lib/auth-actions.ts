@@ -7,6 +7,9 @@ import { createClient } from '@/utils/supabase/server'
 
 export async function login(formData: FormData) {
     const supabase = await createClient()
+    if (!supabase) {
+        redirect('/error?message=' + encodeURIComponent('Supabase is not configured. Use the Demo login instead.'))
+    }
 
     const data = {
         email: formData.get('email') as string,
@@ -25,6 +28,9 @@ export async function login(formData: FormData) {
 
 export async function signup(formData: FormData) {
     const supabase = await createClient()
+    if (!supabase) {
+        redirect('/error?message=' + encodeURIComponent('Supabase is not configured. Use the Demo login instead.'))
+    }
 
     const data = {
         email: formData.get('email') as string,
@@ -43,6 +49,10 @@ export async function signup(formData: FormData) {
 
 export async function signInWithGoogle() {
     const supabase = await createClient()
+    if (!supabase) {
+        redirect('/error?message=' + encodeURIComponent('Supabase is not configured. Google sign-in is unavailable.'))
+    }
+
     const origin = (await headers()).get('origin')
 
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -63,7 +73,10 @@ export async function signInWithGoogle() {
 
 export async function logout() {
     const supabase = await createClient()
-    await supabase.auth.signOut()
+    if (supabase) {
+        await supabase.auth.signOut()
+    }
     revalidatePath('/', 'layout')
     redirect('/login')
 }
+

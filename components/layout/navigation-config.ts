@@ -5,7 +5,8 @@ export type NavIconName =
   | "bar-chart-3"
   | "settings"
   | "user-circle-2"
-  | "log-in";
+  | "log-in"
+  | "log-out";
 
 export const adminNavGroups = [
   {
@@ -39,7 +40,7 @@ export const publicNavGroups = [
     defaultOpen: true,
     items: [
       { href: "/map", label: "Map", icon: "map" as NavIconName },
-      { href: "/login", label: "Work Orders", icon: "clipboard-list" as NavIconName }
+      { href: "/work-orders", label: "Work Orders", icon: "clipboard-list" as NavIconName }
     ]
   },
   {
@@ -48,7 +49,7 @@ export const publicNavGroups = [
     defaultOpen: true,
     items: [
       { href: "/account", label: "Account", icon: "user-circle-2" as NavIconName },
-      { href: "/login", label: "Login", icon: "log-in" as NavIconName }
+      { href: "/login", label: "Login", guestOnly: true, icon: "log-in" as NavIconName }
     ]
   }
 ] as const;
