@@ -3,9 +3,9 @@ import { createClient } from '@/utils/supabase/server'
 
 export default async function LoginLogoutButton() {
     const supabase = await createClient()
-    const {
-        data: { user },
-    } = await supabase.auth.getUser()
+    const user = supabase
+        ? (await supabase.auth.getUser()).data.user
+        : null
 
     if (user) {
         return (

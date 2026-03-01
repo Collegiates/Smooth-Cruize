@@ -1,21 +1,27 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RoleGate } from "@/components/auth/role-gate";
+import { publicNavGroups } from "@/components/layout/navigation-config";
 import { useSession } from "@/hooks/use-session";
 
 export default function AccountPage() {
   const router = useRouter();
-  const { session, signOut } = useSession();
-  const currentRole = session?.user.isAdmin ? "admin" : "user";
+  const { session, isLoading, signOut } = useSession();
 
   return (
-    <AppShell title="Account" subtitle="Current session, role, and sign-out controls.">
-      <RoleGate allowedRoles={["user", "admin"]}>
+    <AppShell title="Account" subtitle="Current session, role, and sign-out controls." navGroups={publicNavGroups}>
+      {isLoading ? (
+        <Card className="max-w-2xl">
+          <CardContent className="p-8 text-center text-sm text-gray-500">
+            Loading session...
+          </CardContent>
+        </Card>
+      ) : session ? (
         <Card className="max-w-2xl">
           <CardHeader>
             <CardTitle>Current User</CardTitle>
@@ -28,7 +34,7 @@ export default function AccountPage() {
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Email</p>
-              <p className="mt-1 font-medium">{session?.user.email}</p>
+              <p className="mt-1 font-medium">{session.user.email}</p>
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Role</p>
@@ -48,7 +54,23 @@ export default function AccountPage() {
             </Button>
           </CardContent>
         </Card>
-      </RoleGate>
+      ) : (
+        <Card className="max-w-2xl">
+          <CardHeader>
+            <CardTitle>Sign in to view your account</CardTitle>
+            <CardDescription>You need to be logged in to see your account details.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex gap-3">
+            <Button asChild>
+              <Link href="/login">Sign In</Link>
+            </Button>
+            <Button variant="outline" asChild>
+              <Link href="/map">Back to map</Link>
+            </Button>
+          </CardContent>
+        </Card>
+      )}
     </AppShell>
   );
 }
+
