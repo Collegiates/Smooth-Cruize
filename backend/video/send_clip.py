@@ -9,9 +9,12 @@ import json
 import time
 from datetime import datetime
 from video.gps_data import GPSData
+import random
 
 # Initialize mock GPS Data
-location = GPSData()
+latitude = 39.6838 + ((random.random() - 0.5) * 0.0030)
+longitude = (-75.7512) + ((random.random() - 0.5) * 0.0036)
+location = GPSData(latitude, longitude)
 
 # Load API keys from .env
 load_dotenv()
@@ -75,7 +78,7 @@ async def upload_pothole_clip(
 
                 # Create a prompt that includes the lat/long from parameters
                 prompt = f"""
-                Analyze this video of a pothole event. 
+                Analyze this video of a pothole event. Keep the response short and concise. 20 words for the analysis.
                 The pothole was recorded at latitude: {latitude}, longitude: {longitude}.
                 Please provide a JSON response containing two keys:
                 - "severity": an integer between 1 and 10 indicating the severity of the pothole (10 being worst).
@@ -85,7 +88,8 @@ async def upload_pothole_clip(
                 # Generate content using the new client format
                 from google.genai import types
                 response = client.models.generate_content(
-                    model='gemini-2.5-pro',
+                    # the fix is to use gemini-2.5-flash instead of gemini-2.5-pro
+                    model='gemini-2.5-flash',
                     contents=[gemini_video, prompt],
                     config=types.GenerateContentConfig(
                         response_mime_type="application/json"
