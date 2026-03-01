@@ -15,16 +15,16 @@ const Context = createContext<SupabaseContext | undefined>(undefined)
 export default function SupabaseProvider({
     children,
     supabaseUrl,
-    supabaseKey,
+    supabaseAnonKey,
     googleMapsApiKey,
 }: {
     children: React.ReactNode
     supabaseUrl: string
-    supabaseKey: string
+    supabaseAnonKey: string
     googleMapsApiKey: string
 }) {
     const [supabase] = useState(() =>
-        createBrowserClient(supabaseUrl, supabaseKey)
+        createBrowserClient(supabaseUrl, supabaseAnonKey)
     )
     const router = useRouter()
 

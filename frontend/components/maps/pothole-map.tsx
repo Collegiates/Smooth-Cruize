@@ -46,7 +46,7 @@ export function PotholeMap({
     return (
       <div className={cn("h-[560px] overflow-auto border border-slate-300 bg-slate-50", className)}>
         <div className="border-b border-slate-300 bg-slate-100 px-3 py-2 text-xs text-slate-600">
-          Add `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` to render the live map. Coordinates remain interactive.
+          Add the Google Maps API key to the backend config response to render the live map. Coordinates remain interactive.
         </div>
         <div className="grid gap-2 p-2">
           {events.map((event) => (

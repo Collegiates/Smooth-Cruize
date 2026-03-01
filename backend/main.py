@@ -38,14 +38,18 @@ def get_env_vars():
     # Provide the environment variables needed by the frontend Supabase integration
     return {
         "NEXT_PUBLIC_SUPABASE_URL": os.getenv("NEXT_PUBLIC_SUPABASE_URL", ""),
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": os.getenv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", ""),
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY": os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY") or os.getenv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", ""),
         "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY": os.getenv("NEXT_PUBLIC_GOOGLE_MAPS_API_KEY", "")
     }
 
 
 def get_supabase_config():
     supabase_url = os.getenv("NEXT_PUBLIC_SUPABASE_URL", "").rstrip("/")
-    supabase_key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "")
+    supabase_key = (
+        os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+        or os.getenv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+        or os.getenv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", "")
+    )
 
     if not supabase_url or not supabase_key:
         raise HTTPException(status_code=500, detail="Supabase backend configuration is missing.")
