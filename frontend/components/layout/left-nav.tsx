@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import type { ComponentType } from "react";
 import {
@@ -74,12 +75,29 @@ export function LeftNav({
       )}
     >
       <div className="flex h-full flex-col">
-        <div className="flex items-center justify-between border-b border-border/80 px-4 py-3">
-          <div className={cn("min-w-0", collapsed && "hidden")}>
-            <div className="text-xs font-medium uppercase tracking-wide text-slate-400">Smooth Cruize</div>
-            <div className="mt-1 truncate text-sm font-semibold text-slate-100">Ops Command Center</div>
-          </div>
-          {!collapsed ? null : <div className="mx-auto text-xs font-medium uppercase tracking-wide text-slate-400">Ops</div>}
+        <div className="flex items-center justify-between border-b border-border/80 px-3 py-2.5">
+          <Link href="/" className={cn("min-w-0 shrink-0 transition-opacity hover:opacity-80", collapsed && "hidden")}>
+            <Image
+              src="/SmoothCruize.png"
+              alt="Smooth Cruize"
+              width={120}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
+          </Link>
+          {collapsed ? (
+            <Link href="/" className="mx-auto hover:opacity-80 transition-opacity">
+              <Image
+                src="/SmoothCruize.png"
+                alt="Smooth Cruize"
+                width={40}
+                height={40}
+                className="h-8 w-8 rounded-full object-cover"
+                priority
+              />
+            </Link>
+          ) : null}
           <Button
             variant="ghost"
             size="icon"
