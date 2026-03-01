@@ -30,7 +30,7 @@ export default function AccountPage() {
           <CardContent className="space-y-4 text-sm">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Display Name</p>
-              <p className="mt-1 font-medium">{session.profile.display_name}</p>
+              <p className="mt-1 font-medium">{session?.profile.full_name}</p>
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Email</p>
@@ -38,7 +38,11 @@ export default function AccountPage() {
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Role</p>
-              <p className="mt-1 font-medium uppercase">{session.profile.role}</p>
+              <p className="mt-1 font-medium uppercase">{currentRole}</p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Admin Access</p>
+              <p className="mt-1 font-medium uppercase">{session?.profile.is_admin ? "true" : "false"}</p>
             </div>
             <Button
               onClick={async () => {

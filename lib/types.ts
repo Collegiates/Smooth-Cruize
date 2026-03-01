@@ -31,14 +31,15 @@ export type PotholeEvent = {
 
 export type Profile = {
   id: string;
-  role: UserRole;
-  display_name: string;
+  full_name: string;
   email?: string;
+  is_admin: boolean;
 };
 
 export type SessionUser = {
   id: string;
   email: string;
+  isAdmin: boolean;
 };
 
 export type AppSession = {
@@ -60,4 +61,18 @@ export type DashboardMetrics = {
   openCount: number;
   averageSeverity: number;
   last24hCount: number;
+};
+
+export type DailyPotholeStat = {
+  date: string;
+  label: string;
+  reported: number;
+  resolved: number;
+};
+
+export type DailyPotholeSummary = {
+  newToday: number;
+  resolvedToday: number;
+  averageSeverity7d: number;
+  openTotal: number;
 };

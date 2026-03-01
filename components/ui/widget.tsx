@@ -38,11 +38,11 @@ export function Widget({
   const hasContent = Boolean(children);
 
   return (
-    <section className={cn("overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm", className)}>
-      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+    <section className={cn("overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm", className)}>
+      <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
         <div className="min-w-0">
-          <h2 className="truncate text-sm font-semibold text-gray-900">{title}</h2>
-          {subtitle ? <p className="mt-0.5 truncate text-xs text-gray-500">{subtitle}</p> : null}
+          <h2 className="truncate text-sm font-semibold text-slate-900">{title}</h2>
+          {subtitle ? <p className="mt-0.5 truncate text-xs uppercase tracking-wide text-slate-500">{subtitle}</p> : null}
         </div>
         <div className="ml-3 flex items-center gap-1">
           <IconButton label="Refresh" onClick={onRefresh}>
@@ -62,7 +62,7 @@ export function Widget({
           <div className={cn("min-h-[120px]", bodyClassName)} style={{ maxHeight: maxBodyHeight, overflow: "auto" }}>
             {loading ? <WidgetSkeleton /> : hasContent ? children : <WidgetEmpty>{emptyState}</WidgetEmpty>}
           </div>
-          {footer ? <div className="border-t border-gray-200 bg-gray-50 px-4 py-2 text-xs text-gray-500">{footer}</div> : null}
+          {footer ? <div className="border-t border-slate-200 bg-slate-50 px-4 py-2 text-xs text-slate-600">{footer}</div> : null}
         </>
       ) : null}
     </section>
@@ -83,7 +83,7 @@ function IconButton({
       type="button"
       variant="ghost"
       size="icon"
-      className="h-8 w-8 rounded-md text-gray-500 hover:bg-gray-100 hover:text-gray-900"
+      className="h-8 w-8 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-900"
       onClick={onClick}
       aria-label={label}
     >
@@ -94,7 +94,7 @@ function IconButton({
 
 function WidgetEmpty({ children }: { children?: React.ReactNode }) {
   return (
-    <div className="flex h-full min-h-[120px] items-center justify-center px-4 py-10 text-sm text-gray-500">
+    <div className="flex h-full min-h-[120px] items-center justify-center px-4 py-10 text-sm text-slate-600">
       {children ?? "No data available."}
     </div>
   );

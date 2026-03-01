@@ -3,23 +3,26 @@
 import { subHours } from "date-fns";
 
 import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
-import { mockEvents } from "@/lib/mock/pothole-events";
+import { mockEvents, mockEventsVersion } from "@/lib/mock/pothole-events";
 import { readLocalStorage, storageKeys, writeLocalStorage } from "@/lib/storage";
 import type { DashboardMetrics, EventFilters, PotholeEvent } from "@/lib/types";
 
 function getMockEventsStore() {
+  const storedVersion = readLocalStorage<number>(storageKeys.mockEventsVersionKey, 0);
   const stored = readLocalStorage<PotholeEvent[]>(storageKeys.mockEventsKey, []);
 
-  if (stored.length > 0) {
+  if (stored.length > 0 && storedVersion === mockEventsVersion) {
     return stored;
   }
 
   writeLocalStorage(storageKeys.mockEventsKey, mockEvents);
+  writeLocalStorage(storageKeys.mockEventsVersionKey, mockEventsVersion);
   return mockEvents;
 }
 
 function setMockEventsStore(events: PotholeEvent[]) {
   writeLocalStorage(storageKeys.mockEventsKey, events);
+  writeLocalStorage(storageKeys.mockEventsVersionKey, mockEventsVersion);
 }
 
 function applyFilters(events: PotholeEvent[], filters?: EventFilters) {
@@ -39,8 +42,8 @@ function applyFilters(events: PotholeEvent[], filters?: EventFilters) {
     const query = filters.search?.trim().toLowerCase();
     const matchesSearch = query
       ? [event.assigned_to, event.description_ai, event.notes_admin, event.status, event.lane_position]
-          .filter(Boolean)
-          .some((value) => value?.toLowerCase().includes(query))
+        .filter(Boolean)
+        .some((value) => value?.toLowerCase().includes(query))
       : true;
 
     return matchesStatus && matchesSeverity && matchesDateFrom && matchesDateTo && matchesSearch;
@@ -76,7 +79,8 @@ export async function getPotholeEvents(filters?: EventFilters): Promise<PotholeE
     const { data, error } = await query;
 
     if (error) {
-      throw error;
+      console.error("Supabase fetch error:", error);
+      throw new Error(error.message || "Failed to fetch pothole events");
     }
 
     return (data as PotholeEvent[]) ?? [];

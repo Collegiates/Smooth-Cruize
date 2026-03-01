@@ -1,90 +1,36 @@
-# Pothole Detects CMMS
+# YOLO demo scripts
 
-Production-style Next.js 14 App Router frontend for a pothole detection + CMMS hackathon MVP. It includes:
-
-- Public landing page and public pothole map
-- Role-based login flow with Supabase auth support and local demo fallback
-- Admin dashboard with inbox table, map, analytics, CSV export, and create-work-order flow
-- Dedicated work-order detail page with video evidence and editable form
-
-## Stack
-
-- Next.js 14 App Router + TypeScript
-- TailwindCSS
-- shadcn-style UI components
-- React Hook Form + Zod
-- Supabase JS client
-- Google Maps via `@react-google-maps/api` with placeholder fallback if the API key is missing
+Quick demos for a YOLO model (`best.pt`): live camera, video file, and single image.
 
 ## Setup
 
-1. Install dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Put your `best.pt` in this folder (or pass `--model /path/to/best.pt`).
+
+## Usage
+
+**Live webcam detection** (press `q` to quit):
 
 ```bash
-npm install
+python live_detection.py
+python live_detection.py --camera 1 --conf 0.5
 ```
 
-2. Create `.env.local`:
+**Process a video file** (writes `input_detected.mp4` by default):
 
 ```bash
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
+python video_processing.py path/to/video.mp4
+python video_processing.py video.mp4 -o output.mp4 --conf 0.4
 ```
 
-
-2.5 installing supabase
+**Process an image** (shows and saves `input_detected.jpg` by default):
 
 ```bash
-npm install @supabase/supabase-js @supabase/ssr
+python image_processing.py path/to/image.jpg
+python image_processing.py image.jpg -o out.jpg --no-show
 ```
 
-3. Start the dev server:
-
-```bash
-npm run dev
-```
-
-4. Open [http://localhost:3000](http://localhost:3000)
-
-## Demo fallback behavior
-
-If Supabase env vars are absent:
-
-- Login uses local demo sessions
-- Data reads and writes use mock pothole events persisted in `localStorage`
-- The app still compiles and runs without external backend dependencies
-
-If the Google Maps API key is absent:
-
-- The map panels render a polished placeholder list with selectable event coordinates
-
-## Project structure
-
-```text
-app/
-  admin/
-    dashboard/
-    work-orders/[id]/
-  account/
-  login/
-  map/
-components/
-  auth/
-  layout/
-  maps/
-  providers/
-  ui/
-  work-orders/
-hooks/
-lib/
-  api/
-  mock/
-  supabase/
-```
-
-## Notes for backend integration
-
-- `lib/api/pothole-events.ts` is the swap point for moving from mock/Supabase reads to FastAPI endpoints.
-- `lib/auth.ts` and `lib/supabase/client.ts` isolate auth/session bootstrapping.
-- `profiles.role` is used for UI-level access control.
+All scripts accept `--model` to point to your weights and `--conf` for the confidence threshold.

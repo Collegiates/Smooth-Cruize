@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Download, RefreshCw } from "lucide-react";
 
+import { DailyPotholeChart } from "@/components/charts/DailyPotholeChart";
 import { CreateWorkOrderDialog } from "@/components/work-orders/create-work-order-dialog";
 import { FiltersBar } from "@/components/maps/filters-bar";
 import { WorkOrdersTable } from "@/components/work-orders/work-orders-table";
@@ -10,7 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Widget } from "@/components/ui/widget";
 import { useToast } from "@/components/ui/toast-provider";
 import { exportEventsAsCsv, getPotholeEvents } from "@/lib/api/pothole-events";
-import type { EventFilters, PotholeEvent, PotholeStatus } from "@/lib/types";
+import { getDailyPotholeStats } from "@/lib/analytics";
+import type { DailyPotholeStat, DailyPotholeSummary, EventFilters, PotholeEvent, PotholeStatus } from "@/lib/types";
 
 const initialFilters: EventFilters = {
   status: "all",
@@ -32,14 +34,29 @@ export default function AdminDashboardPage() {
   const [filters, setFilters] = useState<EventFilters>(initialFilters);
   const [events, setEvents] = useState<PotholeEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [analyticsLoading, setAnalyticsLoading] = useState(true);
+  const [dailyStats, setDailyStats] = useState<DailyPotholeStat[]>([]);
+  const [dailySummary, setDailySummary] = useState<DailyPotholeSummary>({
+    newToday: 0,
+    resolvedToday: 0,
+    averageSeverity7d: 0,
+    openTotal: 0
+  });
   const [sortDescending, setSortDescending] = useState(true);
 
   const refreshEvents = async () => {
     setLoading(true);
-    const nextEvents = await getPotholeEvents(filters);
+    setAnalyticsLoading(true);
+    const [nextEvents, analytics] = await Promise.all([
+      getPotholeEvents(filters),
+      getDailyPotholeStats()
+    ]);
     const sortedEvents = sortEvents(nextEvents, sortDescending);
     setEvents(sortedEvents);
+    setDailyStats(analytics.stats);
+    setDailySummary(analytics.summary);
     setLoading(false);
+    setAnalyticsLoading(false);
   };
 
   useEffect(() => {
@@ -83,7 +100,10 @@ export default function AdminDashboardPage() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="text-sm text-gray-600">Dashboard-only view. Use the admin Map route for work-order map triage.</div>
+        <div>
+          <div className="text-lg font-semibold text-slate-900">Municipal Operations Overview</div>
+          <div className="text-sm text-slate-600">Daily pothole activity, work order backlog, and service distribution.</div>
+        </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <CreateWorkOrderDialog
@@ -105,9 +125,9 @@ export default function AdminDashboardPage() {
 
       <div className="grid gap-3 md:grid-cols-4">
         {metrics.map((metric) => (
-          <div key={metric.label} className="rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-sm">
-            <div className="text-xs text-gray-500">{metric.label}</div>
-            <div className="mt-1 text-xl font-semibold text-gray-900">{metric.value}</div>
+          <div key={metric.label} className="rounded-lg border border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="text-xs uppercase tracking-wide text-slate-600">{metric.label}</div>
+            <div className="mt-1 text-xl font-semibold tabular-nums text-slate-900">{metric.value}</div>
           </div>
         ))}
       </div>
@@ -121,8 +141,8 @@ export default function AdminDashboardPage() {
             type="button"
             className={`rounded-full border px-3 py-1 text-xs transition-colors ${
               (filters.status ?? "all") === status
-                ? "border-sky-200 bg-sky-50 text-sky-700"
-                : "border-gray-200 bg-white text-gray-600 hover:border-gray-300 hover:text-gray-900"
+                ? "border-blue-200 bg-blue-50 text-blue-700"
+                : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
             }`}
             onClick={() => handleQuickFilter(status)}
           >
@@ -131,41 +151,56 @@ export default function AdminDashboardPage() {
         ))}
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-2">
+      <div className="space-y-4">
+        <div className="grid gap-4 xl:grid-cols-2">
+          <Widget
+            title="Work Orders Inbox"
+            subtitle="Prioritized by severity"
+            onRefresh={() => void refreshEvents()}
+            loading={loading}
+            emptyState="No work orders match the current filters."
+            footer={<span>{events.length} visible work orders</span>}
+            maxBodyHeight="420px"
+          >
+            <WorkOrdersTable
+              events={events}
+              onSelectEvent={() => undefined}
+              sortDescending={sortDescending}
+              onToggleSort={() => setSortDescending((value) => !value)}
+            />
+          </Widget>
+
+          <Widget title="Maintenance Status Overview" subtitle="Current workflow mix" maxBodyHeight="420px">
+            <div className="p-4">
+              <StatusChart />
+            </div>
+          </Widget>
+        </div>
+
         <Widget
-          title="Work Orders Inbox"
-          subtitle="Prioritized by severity"
+          title="Daily Pothole Activity"
+          subtitle="Reported vs resolved over the last 14 days"
           onRefresh={() => void refreshEvents()}
-          loading={loading}
-          emptyState="No work orders match the current filters."
-          footer={<span>{events.length} visible work orders</span>}
-          maxBodyHeight="420px"
+          loading={analyticsLoading}
+          emptyState="No activity available for the last 14 days."
+          maxBodyHeight="none"
         >
-          <WorkOrdersTable
-            events={events}
-            onSelectEvent={() => undefined}
-            sortDescending={sortDescending}
-            onToggleSort={() => setSortDescending((value) => !value)}
-          />
+          <DailyPotholeChart data={dailyStats} summary={dailySummary} loading={analyticsLoading} />
         </Widget>
 
-        <Widget title="Maintenance Status Overview" subtitle="Current workflow mix" maxBodyHeight="420px">
-          <div className="p-4">
-            <StatusChart />
-          </div>
-        </Widget>
+        <div className="grid gap-4 xl:grid-cols-2">
+          <Widget title="Detections by Month" subtitle="Rolling trend" maxBodyHeight="420px">
+            <div className="p-4">
+              <MonthlyBars />
+            </div>
+          </Widget>
 
-        <Widget title="Detections by Month" subtitle="Rolling trend" maxBodyHeight="420px">
-          <div className="p-4">
-            <MonthlyBars />
-          </div>
-        </Widget>
-
-        <Widget title="Services In Process" subtitle="Crew distribution" maxBodyHeight="420px">
-          <div className="p-4">
-            <ServicesDonut />
-          </div>
-        </Widget>
+          <Widget title="Services In Process" subtitle="Crew distribution" maxBodyHeight="420px">
+            <div className="p-4">
+              <ServicesDonut />
+            </div>
+          </Widget>
+        </div>
       </div>
     </div>
   );
@@ -173,10 +208,10 @@ export default function AdminDashboardPage() {
 
 function StatusChart() {
   const series = [
-    { label: "Open", value: 22, color: "#ef4444" },
-    { label: "Assigned", value: 15, color: "#0ea5e9" },
-    { label: "In Progress", value: 11, color: "#f59e0b" },
-    { label: "Resolved", value: 18, color: "#10b981" }
+    { label: "Open", value: 22, color: "#f59e0b" },
+    { label: "Assigned", value: 15, color: "#2563eb" },
+    { label: "In Progress", value: 11, color: "#7c3aed" },
+    { label: "Resolved", value: 18, color: "#16a34a" }
   ];
   const max = Math.max(...series.map((item) => item.value));
 
@@ -184,11 +219,11 @@ function StatusChart() {
     <div className="space-y-3">
       {series.map((item) => (
         <div key={item.label} className="grid grid-cols-[100px_1fr_36px] items-center gap-3">
-          <span className="text-sm text-gray-600">{item.label}</span>
-          <div className="h-2 rounded-full bg-gray-100">
+          <span className="text-sm text-slate-600">{item.label}</span>
+          <div className="h-2 rounded-full bg-slate-100">
             <div className="h-2 rounded-full" style={{ width: `${(item.value / max) * 100}%`, backgroundColor: item.color }} />
           </div>
-          <span className="text-right text-sm font-medium text-gray-900">{item.value}</span>
+          <span className="text-right text-sm font-medium tabular-nums text-slate-900">{item.value}</span>
         </div>
       ))}
     </div>
@@ -214,10 +249,10 @@ function MonthlyBars() {
         return (
           <g key={item.month}>
             <rect x={x} y={170 - barHeight} width="28" height={barHeight} rx="6" fill="#38bdf8" />
-            <text x={x + 14} y={190} textAnchor="middle" fontSize="12" fill="#6b7280">
+            <text x={x + 14} y={190} textAnchor="middle" fontSize="12" fill="#475569">
               {item.month}
             </text>
-            <text x={x + 14} y={160 - barHeight} textAnchor="middle" fontSize="11" fill="#111827">
+            <text x={x + 14} y={160 - barHeight} textAnchor="middle" fontSize="11" fill="#0f172a">
               {item.value}
             </text>
           </g>
@@ -229,10 +264,10 @@ function MonthlyBars() {
 
 function ServicesDonut() {
   const slices = [
-    { label: "Patching", value: 38, color: "#0ea5e9" },
-    { label: "Dispatch", value: 27, color: "#f59e0b" },
-    { label: "QA", value: 19, color: "#10b981" },
-    { label: "Rejected", value: 16, color: "#ef4444" }
+    { label: "Patching", value: 38, color: "#2563eb" },
+    { label: "Dispatch", value: 27, color: "#0f766e" },
+    { label: "QA", value: 19, color: "#16a34a" },
+    { label: "Rejected", value: 16, color: "#dc2626" }
   ];
   const gradient = `conic-gradient(${slices
     .map((slice, index) => {
@@ -249,12 +284,12 @@ function ServicesDonut() {
       </div>
       <div className="space-y-2">
         {slices.map((slice) => (
-          <div key={slice.label} className="flex items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm">
+          <div key={slice.label} className="flex items-center justify-between rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm">
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-full" style={{ backgroundColor: slice.color }} />
-              <span className="text-gray-700">{slice.label}</span>
+              <span className="text-slate-700">{slice.label}</span>
             </div>
-            <span className="font-medium text-gray-900">{slice.value}%</span>
+            <span className="font-medium tabular-nums text-slate-900">{slice.value}%</span>
           </div>
         ))}
       </div>
