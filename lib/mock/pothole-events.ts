@@ -105,26 +105,28 @@ export const demoSessions: Record<"admin" | "user", AppSession> = {
   admin: {
     user: {
       id: "demo-admin-id",
-      email: "admin@demo.local"
+      email: "admin@demo.local",
+      isAdmin: true
     },
     profile: {
       id: "demo-admin-id",
-      role: "admin",
-      display_name: "Demo Admin",
-      email: "admin@demo.local"
+      full_name: "Demo Admin",
+      email: "admin@demo.local",
+      is_admin: true
     },
     source: "demo"
   },
   user: {
     user: {
       id: "demo-user-id",
-      email: "user@demo.local"
+      email: "user@demo.local",
+      isAdmin: false
     },
     profile: {
       id: "demo-user-id",
-      role: "user",
-      display_name: "Demo User",
-      email: "user@demo.local"
+      full_name: "Demo User",
+      email: "user@demo.local",
+      is_admin: false
     },
     source: "demo"
   }

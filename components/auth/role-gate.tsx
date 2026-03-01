@@ -16,6 +16,7 @@ type RoleGateProps = {
 
 export function RoleGate({ allowedRoles, children, fallback }: RoleGateProps) {
   const { session, isLoading } = useSession();
+  const currentRole = session ? (session.user.isAdmin ? "admin" : "user") : null;
 
   if (isLoading) {
     return (
@@ -26,7 +27,7 @@ export function RoleGate({ allowedRoles, children, fallback }: RoleGateProps) {
     );
   }
 
-  if (!session || !allowedRoles.includes(session.profile.role)) {
+  if (!session || !currentRole || !allowedRoles.includes(currentRole)) {
     return (
       fallback ?? (
         <Card>

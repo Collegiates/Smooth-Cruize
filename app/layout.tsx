@@ -22,8 +22,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${manrope.variable} ${fraunces.variable} font-sans`}>
+    // Add suppressHydrationWarning to both html and body tags
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${manrope.variable} ${fraunces.variable} font-sans`} suppressHydrationWarning>
         <AppProvider>{children}</AppProvider>
       </body>
     </html>

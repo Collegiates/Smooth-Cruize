@@ -42,8 +42,8 @@ function applyFilters(events: PotholeEvent[], filters?: EventFilters) {
     const query = filters.search?.trim().toLowerCase();
     const matchesSearch = query
       ? [event.assigned_to, event.description_ai, event.notes_admin, event.status, event.lane_position]
-          .filter(Boolean)
-          .some((value) => value?.toLowerCase().includes(query))
+        .filter(Boolean)
+        .some((value) => value?.toLowerCase().includes(query))
       : true;
 
     return matchesStatus && matchesSeverity && matchesDateFrom && matchesDateTo && matchesSearch;
@@ -79,7 +79,8 @@ export async function getPotholeEvents(filters?: EventFilters): Promise<PotholeE
     const { data, error } = await query;
 
     if (error) {
-      throw error;
+      console.error("Supabase fetch error:", error);
+      throw new Error(error.message || "Failed to fetch pothole events");
     }
 
     return (data as PotholeEvent[]) ?? [];

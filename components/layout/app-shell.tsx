@@ -62,7 +62,7 @@ export function AppShell({ title, subtitle, breadcrumbs, navGroups = [], childre
   const filteredGroups = navGroups
     .map((group) => ({
       ...group,
-      items: group.items.filter((item) => !item.adminOnly || session?.profile.role === "admin")
+      items: group.items.filter((item) => !item.adminOnly || session?.user.isAdmin)
     }))
     .filter((group) => group.items.length > 0);
 
@@ -83,7 +83,7 @@ export function AppShell({ title, subtitle, breadcrumbs, navGroups = [], childre
           breadcrumbs={derivedMeta.breadcrumbs}
           subtitle={subtitle}
           onToggleNav={() => setMobileNavOpen((value) => !value)}
-          userLabel={session?.profile.display_name ?? "Guest"}
+          userLabel={session?.profile.full_name ?? "Guest"}
           session={Boolean(session)}
           userMenuOpen={userMenuOpen}
           onToggleUserMenu={() => setUserMenuOpen((value) => !value)}

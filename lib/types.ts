@@ -31,14 +31,15 @@ export type PotholeEvent = {
 
 export type Profile = {
   id: string;
-  role: UserRole;
-  display_name: string;
+  full_name: string;
   email?: string;
+  is_admin: boolean;
 };
 
 export type SessionUser = {
   id: string;
   email: string;
+  isAdmin: boolean;
 };
 
 export type AppSession = {
