@@ -6,6 +6,7 @@ Process a video file with YOLO: run detection on each frame and save the result.
 import argparse
 from pathlib import Path
 
+import cv2
 from ultralytics import YOLO
 
 
@@ -50,8 +51,11 @@ def main():
         output_path = Path(args.output)
 
     model = YOLO(str(model_path))
-
-    import cv2
+    cap = cv2.VideoCapture(str(input_path))
+    input_fps = cap.get(cv2.CAP_PROP_FPS)
+    cap.release()
+    if input_fps <= 0:
+        input_fps = 30.0
 
     print(f"Processing: {input_path} -> {output_path}")
     results = model.predict(
@@ -62,16 +66,16 @@ def main():
 
     out = None
     for result in results:
-        frame = result.plot()
+        # Draw YOLO bounding boxes/labels directly on each output frame.
+        frame = result.plot(conf=True, labels=True, line_width=2)
         if out is None:
             h, w = frame.shape[:2]
             fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-            out = cv2.VideoWriter(str(output_path), fourcc, 30, (w, h))
+            out = cv2.VideoWriter(str(output_path), fourcc, input_fps, (w, h))
         out.write(frame)
 
     if out is not None:
         out.release()
-    print(f"Saved: {output_path}")
     print(f"Saved: {output_path}")
 
 

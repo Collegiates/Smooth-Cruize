@@ -2,4 +2,5 @@ fastapi
 uvicorn
 python-dotenv
 pydantic
-certifi
+supabase
+google-generativeai
