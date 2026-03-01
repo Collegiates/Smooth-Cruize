@@ -16,8 +16,13 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  title: "Pothole Detects CMMS",
-  description: "Frontend MVP for pothole detection review and CMMS work order operations."
+  title: "Smooth Cruize",
+  description: "Pothole detection and CMMS work order platform for road maintenance operations.",
+  icons: {
+    icon: "/SmoothCruize.png",
+    shortcut: "/SmoothCruize.png",
+    apple: "/SmoothCruize.png"
+  }
 };
 
 import { getConfigForClient } from "@/utils/supabase/server";
