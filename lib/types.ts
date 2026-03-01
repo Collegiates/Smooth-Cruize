@@ -61,3 +61,17 @@ export type DashboardMetrics = {
   averageSeverity: number;
   last24hCount: number;
 };
+
+export type DailyPotholeStat = {
+  date: string;
+  label: string;
+  reported: number;
+  resolved: number;
+};
+
+export type DailyPotholeSummary = {
+  newToday: number;
+  resolvedToday: number;
+  averageSeverity7d: number;
+  openTotal: number;
+};
