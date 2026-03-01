@@ -41,58 +41,32 @@ export async function getCurrentSession(): Promise<AppSession | null> {
         return null;
       }
 
-      // Try to fetch profile from profiles table; fall back to auth user data
+      const email = session.user.email ?? "unknown@example.com";
       const { data: profile } = await supabase
-        .from("profiles")
-        .select("id, role, display_name")
+        .from("user_profiles")
+        .select("id, email, full_name, is_admin")
         .eq("id", session.user.id)
-        .single();
-
-      const resolvedProfile: Profile = profile
-        ? (profile as Profile)
-        : {
-          id: session.user.id,
-          role: "user" as const,
-          display_name:
-            session.user.user_metadata?.full_name ??
-            session.user.email?.split("@")[0] ??
-            "User"
-        };
+        .maybeSingle();
+      const isAdmin = Boolean(profile?.is_admin);
+      const resolvedProfile: Profile = buildSessionProfile({
+        id: session.user.id,
+        email,
+        fullName: profile?.full_name ?? session.user.user_metadata?.full_name,
+        isAdmin
+      });
 
       return {
         user: {
           id: session.user.id,
-          email: session.user.email ?? "unknown@example.com"
+          email,
+          isAdmin
         },
         profile: resolvedProfile,
         source: "supabase"
       };
     } catch {
-      // If Supabase calls fail, fall through to demo mode
+      return null;
     }
-
-    const { data: profile } = await supabase
-      .from("user_profiles")
-      .select("id, email, full_name, is_admin")
-      .eq("id", session.user.id)
-      .single();
-    const email = session.user.email ?? "unknown@example.com";
-    const isAdmin = Boolean(profile?.is_admin);
-
-    return {
-      user: {
-        id: session.user.id,
-        email,
-        isAdmin
-      },
-      profile: buildSessionProfile({
-        id: session.user.id,
-        email,
-        fullName: profile?.full_name,
-        isAdmin
-      }),
-      source: "supabase"
-    };
   }
 
   return readLocalStorage<AppSession | null>(storageKeys.mockSessionKey, null);

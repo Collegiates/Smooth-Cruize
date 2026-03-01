@@ -63,7 +63,7 @@ export function AppShell({ title, subtitle, breadcrumbs, navGroups = [], childre
     .map((group) => ({
       ...group,
       items: group.items.filter((item) => {
-        if (item.adminOnly && session?.profile.role !== "admin") return false;
+        if (item.adminOnly && !session?.user.isAdmin) return false;
         if ("guestOnly" in item && item.guestOnly && session) return false;
         return true;
       })

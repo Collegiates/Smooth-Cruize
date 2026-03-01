@@ -2,47 +2,86 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/layout/app-shell";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { publicNavGroups } from "@/components/layout/navigation-config";
 import { useSession } from "@/hooks/use-session";
+import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
+import type { Profile } from "@/lib/types";
+
+type DatabaseProfile = Pick<Profile, "id" | "email" | "full_name" | "is_admin">;
 
 export default function AccountPage() {
   const router = useRouter();
   const { session, isLoading, signOut } = useSession();
+  const [profile, setProfile] = useState<DatabaseProfile | null>(null);
+  const [isProfileLoading, setIsProfileLoading] = useState(false);
+
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!session?.user.id || !hasSupabaseEnv()) {
+        setProfile(session?.profile ?? null);
+        return;
+      }
+
+      const supabase = getSupabaseBrowserClient();
+
+      if (!supabase) {
+        setProfile(session.profile);
+        return;
+      }
+
+      setIsProfileLoading(true);
+
+      const { data, error } = await supabase
+        .from("user_profiles")
+        .select("id, email, full_name, is_admin")
+        .eq("id", session.user.id)
+        .maybeSingle();
+
+      if (error || !data) {
+        setProfile(session.profile);
+      } else {
+        setProfile(data as DatabaseProfile);
+      }
+
+      setIsProfileLoading(false);
+    };
+
+    void loadProfile();
+  }, [session]);
+
+  const activeProfile = profile ?? session?.profile ?? null;
 
   return (
     <AppShell title="Account" subtitle="Current session, role, and sign-out controls." navGroups={publicNavGroups}>
-      {isLoading ? (
+      {isLoading || isProfileLoading ? (
         <Card className="max-w-2xl">
           <CardContent className="p-8 text-center text-sm text-gray-500">
-            Loading session...
+            Loading account...
           </CardContent>
         </Card>
       ) : session ? (
         <Card className="max-w-2xl">
           <CardHeader>
             <CardTitle>Current User</CardTitle>
-            <CardDescription>Role-based navigation is resolved from the active profile record.</CardDescription>
+            <CardDescription>Account details are loaded from the `user_profiles` table for the current session.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 text-sm">
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Display Name</p>
-              <p className="mt-1 font-medium">{session?.profile.full_name}</p>
+              <p className="mt-1 font-medium">{activeProfile?.full_name ?? session.user.email}</p>
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Email</p>
-              <p className="mt-1 font-medium">{session.user.email}</p>
-            </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Role</p>
-              <p className="mt-1 font-medium uppercase">{currentRole}</p>
+              <p className="mt-1 font-medium">{activeProfile?.email ?? session.user.email}</p>
             </div>
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Admin Access</p>
-              <p className="mt-1 font-medium uppercase">{session?.profile.is_admin ? "true" : "false"}</p>
+              <p className="mt-1 font-medium uppercase">{activeProfile?.is_admin ? "true" : "false"}</p>
             </div>
             <Button
               onClick={async () => {
@@ -73,4 +112,3 @@ export default function AccountPage() {
     </AppShell>
   );
 }
-

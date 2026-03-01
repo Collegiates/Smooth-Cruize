@@ -15,7 +15,7 @@ export default function WorkOrdersPage() {
 
     // If the user is an admin, redirect them straight to the admin work orders
     useEffect(() => {
-        if (!isLoading && session?.profile.role === "admin") {
+        if (!isLoading && session?.user.isAdmin) {
             router.replace("/admin/dashboard");
         }
     }, [session, isLoading, router]);

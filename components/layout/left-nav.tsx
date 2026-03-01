@@ -14,7 +14,8 @@ import {
   PanelLeftOpen,
   Search,
   Settings,
-  UserCircle2
+  UserCircle2,
+  Users
 } from "lucide-react";
 import { useState } from "react";
 
@@ -44,6 +45,7 @@ const iconMap: Record<NavIconName, ComponentType<{ className?: string }>> = {
   "bar-chart-3": BarChart3,
   settings: Settings,
   "user-circle-2": UserCircle2,
+  users: Users,
   "log-in": LogIn,
   "log-out": LogOut
 };

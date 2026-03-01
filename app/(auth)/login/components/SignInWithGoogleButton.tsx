@@ -1,20 +1,15 @@
 'use client'
 
 import { signInWithGoogle } from '@/lib/auth-actions'
-import { useState } from 'react'
+import { useFormStatus } from 'react-dom'
 
-export default function SignInWithGoogleButton() {
-    const [isLoading, setIsLoading] = useState(false)
+function GoogleSubmitButton() {
+    const { pending } = useFormStatus()
 
     return (
         <button
-            type="button"
-            disabled={isLoading}
-            onClick={async () => {
-                setIsLoading(true)
-                await signInWithGoogle()
-                setIsLoading(false)
-            }}
+            type="submit"
+            disabled={pending}
             className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow disabled:cursor-not-allowed disabled:opacity-50"
         >
             <svg className="h-5 w-5" viewBox="0 0 24 24">
@@ -35,7 +30,15 @@ export default function SignInWithGoogleButton() {
                     fill="#EA4335"
                 />
             </svg>
-            {isLoading ? 'Redirecting...' : 'Continue with Google'}
+            {pending ? 'Redirecting...' : 'Continue with Google'}
         </button>
+    )
+}
+
+export default function SignInWithGoogleButton() {
+    return (
+        <form action={signInWithGoogle}>
+            <GoogleSubmitButton />
+        </form>
     )
 }

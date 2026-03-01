@@ -5,6 +5,7 @@ export type NavIconName =
   | "bar-chart-3"
   | "settings"
   | "user-circle-2"
+  | "users"
   | "log-in"
   | "log-out";
 
@@ -29,7 +30,10 @@ export const adminNavGroups = [
     id: "administration",
     label: "Administration",
     defaultOpen: true,
-    items: [{ href: "/account", label: "Settings", adminOnly: true, icon: "settings" as NavIconName }]
+    items: [
+      { href: "/admin/users", label: "Manage Users", adminOnly: true, icon: "users" as NavIconName },
+      { href: "/account", label: "Settings", adminOnly: true, icon: "settings" as NavIconName }
+    ]
   }
 ] as const;
 
