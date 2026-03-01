@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { potholeStatuses, type PotholeEvent } from "@/lib/types";
-import { formatCoordinates, formatDateTime } from "@/lib/utils";
+import { formatCoordinates, formatDateTime, resolveClipUrl } from "@/lib/utils";
 import { updatePotholeEvent } from "@/lib/api/pothole-events";
 import { PotholeMap } from "@/components/maps/pothole-map";
 import { Button } from "@/components/ui/button";
@@ -46,6 +46,7 @@ export function WorkOrderDetail({ event, onUpdated, compact = false }: WorkOrder
   const { pushToast } = useToast();
   const [isSaving, setIsSaving] = useState(false);
   const [resolveConfirmOpen, setResolveConfirmOpen] = useState(false);
+  const clipUrl = resolveClipUrl(event);
 
   const form = useForm<WorkOrderFormValues>({
     resolver: zodResolver(workOrderSchema),
@@ -140,9 +141,15 @@ export function WorkOrderDetail({ event, onUpdated, compact = false }: WorkOrder
       <div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-4">
           <Widget title="Clip Evidence" subtitle="Source video snippet" maxBodyHeight="none" bodyClassName="p-4">
-            <video controls poster={event.thumbnail_url} className="rounded-lg border border-white/10">
-              <source src={event.clip_url} />
-            </video>
+            {clipUrl ? (
+              <video controls poster={event.thumbnail_url || undefined} className="rounded-lg border border-white/10">
+                <source src={clipUrl} />
+              </video>
+            ) : (
+              <div className="rounded-lg border border-dashed border-white/10 bg-white/5 p-4 text-sm text-slate-400">
+                No clip evidence is available for this work order.
+              </div>
+            )}
           </Widget>
 
           <Widget title="Location Preview" subtitle="Map mini-preview" maxBodyHeight="none" bodyClassName="p-0">

@@ -69,6 +69,73 @@ function normalizeEvent(record: Record<string, unknown>): PotholeEvent {
   };
 }
 
+type ClipRecord = {
+  event_id: string;
+  video_url: string;
+  captured_at?: string | null;
+};
+
+function mergeClipUrls(events: PotholeEvent[], clips: ClipRecord[]) {
+  if (events.length === 0 || clips.length === 0) {
+    return events;
+  }
+
+  const latestClipByEventId = new Map<string, ClipRecord>();
+
+  for (const clip of clips) {
+    const current = latestClipByEventId.get(clip.event_id);
+
+    if (!current) {
+      latestClipByEventId.set(clip.event_id, clip);
+      continue;
+    }
+
+    const currentTime = current.captured_at ? new Date(current.captured_at).getTime() : 0;
+    const nextTime = clip.captured_at ? new Date(clip.captured_at).getTime() : 0;
+
+    if (nextTime >= currentTime) {
+      latestClipByEventId.set(clip.event_id, clip);
+    }
+  }
+
+  return events.map((event) => {
+    if (event.clip_url) {
+      return event;
+    }
+
+    const matchingClip = latestClipByEventId.get(event.id);
+
+    if (!matchingClip?.video_url) {
+      return event;
+    }
+
+    return {
+      ...event,
+      clip_url: matchingClip.video_url
+    };
+  });
+}
+
+async function fetchClipsForEvents(eventIds: string[], supabase: SupabaseClient) {
+  if (eventIds.length === 0) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("clips")
+    .select("event_id, video_url, captured_at")
+    .in("event_id", eventIds);
+
+  if (error) {
+    console.error("Supabase clip fetch error:", error);
+    return [];
+  }
+
+  return ((data as ClipRecord[] | null) ?? []).filter(
+    (clip) => typeof clip.event_id === "string" && typeof clip.video_url === "string"
+  );
+}
+
 function getMockEventsStore() {
   const storedVersion = readLocalStorage<number>(storageKeys.mockEventsVersionKey, 0);
   const stored = readLocalStorage<PotholeEvent[]>(storageKeys.mockEventsKey, []);
@@ -135,7 +202,13 @@ export async function getPotholeEvents(filters?: EventFilters, supabase?: Supaba
       throw new Error(error.message || "Failed to fetch pothole events");
     }
 
-    return applyFilters(((data as Record<string, unknown>[] | null) ?? []).map(normalizeEvent), filters).sort(
+    const normalizedEvents = ((data as Record<string, unknown>[] | null) ?? []).map(normalizeEvent);
+    const clips = await fetchClipsForEvents(
+      normalizedEvents.map((event) => event.id),
+      supabase
+    );
+
+    return applyFilters(mergeClipUrls(normalizedEvents, clips), filters).sort(
       (a, b) => b.severity - a.severity
     );
   }
@@ -152,7 +225,9 @@ export async function getPotholeEventById(id: string, supabase?: SupabaseClient)
       throw error;
     }
 
-    return normalizeEvent((data as Record<string, unknown>) ?? {});
+    const normalizedEvent = normalizeEvent((data as Record<string, unknown>) ?? {});
+    const clips = await fetchClipsForEvents([normalizedEvent.id], supabase);
+    return mergeClipUrls([normalizedEvent], clips)[0] ?? normalizedEvent;
   }
 
   return getMockEventsStore().find((event) => event.id === id) ?? null;

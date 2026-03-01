@@ -15,7 +15,7 @@ import { useToast } from "@/components/ui/toast-provider";
 import { Widget } from "@/components/ui/widget";
 import { getPotholeEvents, updatePotholeEvent } from "@/lib/api/pothole-events";
 import type { EventFilters, PotholeEvent, PotholeStatus } from "@/lib/types";
-import { formatDateTime } from "@/lib/utils";
+import { formatDateTime, resolveClipUrl } from "@/lib/utils";
 
 const initialFilters: EventFilters = {
   status: "all",
@@ -118,6 +118,8 @@ function DrawerPanel({
     return null;
   }
 
+  const clipUrl = resolveClipUrl(event);
+
   const saveQuickUpdate = async (nextStatus = status) => {
     setSaving(true);
     try {
@@ -158,9 +160,15 @@ function DrawerPanel({
         </div>
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
           <div className="space-y-2">
-            <video controls poster={event.thumbnail_url} className="rounded-lg border border-white/10">
-              <source src={event.clip_url} />
-            </video>
+            {clipUrl ? (
+              <video controls poster={event.thumbnail_url || undefined} className="rounded-lg border border-white/10">
+                <source src={clipUrl} />
+              </video>
+            ) : (
+              <div className="rounded-lg border border-dashed border-white/10 bg-white/5 p-4 text-sm text-slate-400">
+                No clip evidence is available for this work order.
+              </div>
+            )}
             <div className="flex flex-wrap gap-2">
               <SeverityBadge severity={event.severity} />
               <StatusBadge status={event.status} />
