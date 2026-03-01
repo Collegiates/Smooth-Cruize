@@ -6,7 +6,7 @@ export type ConfigResult =
         success: true
         config: {
             NEXT_PUBLIC_SUPABASE_URL: string
-            NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: string
+            NEXT_PUBLIC_SUPABASE_ANON_KEY: string
             NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: string
         }
     }
@@ -19,11 +19,11 @@ export type ConfigResult =
 async function getSupabaseConfig(): Promise<ConfigResult> {
     const localConfig = {
         NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
         NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
     }
 
-    if (localConfig.NEXT_PUBLIC_SUPABASE_URL && localConfig.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+    if (localConfig.NEXT_PUBLIC_SUPABASE_URL && localConfig.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
         return {
             success: true,
             config: localConfig,
@@ -54,8 +54,8 @@ async function getSupabaseConfig(): Promise<ConfigResult> {
 
         const data = await res.json()
 
-        if (!data.NEXT_PUBLIC_SUPABASE_URL || !data.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
-            if (localConfig.NEXT_PUBLIC_SUPABASE_URL && localConfig.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+        if (!data.NEXT_PUBLIC_SUPABASE_URL || !data.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+            if (localConfig.NEXT_PUBLIC_SUPABASE_URL && localConfig.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
                 return {
                     success: true,
                     config: localConfig,
@@ -72,7 +72,7 @@ async function getSupabaseConfig(): Promise<ConfigResult> {
             success: true,
             config: {
                 NEXT_PUBLIC_SUPABASE_URL: data.NEXT_PUBLIC_SUPABASE_URL,
-                NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: data.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+                NEXT_PUBLIC_SUPABASE_ANON_KEY: data.NEXT_PUBLIC_SUPABASE_ANON_KEY,
                 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: data.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
             },
         }
@@ -95,7 +95,7 @@ export async function createClient() {
 
     return createServerClient(
         configResult.config.NEXT_PUBLIC_SUPABASE_URL,
-        configResult.config.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+        configResult.config.NEXT_PUBLIC_SUPABASE_ANON_KEY,
         {
             cookies: {
                 getAll() {

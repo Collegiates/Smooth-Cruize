@@ -29,6 +29,6 @@ def get_env_vars():
     # Provide the environment variables needed by the frontend Supabase integration
     return {
         "NEXT_PUBLIC_SUPABASE_URL": os.getenv("NEXT_PUBLIC_SUPABASE_URL", ""),
-        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": os.getenv("NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY", ""),
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY": os.getenv("SUPABASE_ANON_KEY", ""),
         "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY": os.getenv("NEXT_PUBLIC_GOOGLE_MAPS_API_KEY", "")
     }

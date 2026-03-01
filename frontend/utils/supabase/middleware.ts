@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 export async function updateSession(request: NextRequest) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
     // If Supabase is not configured or key is invalid (not a JWT),
     // skip all auth checks and let the app run in demo mode.

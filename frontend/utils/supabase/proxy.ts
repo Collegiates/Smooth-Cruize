@@ -19,11 +19,11 @@ type ConfigResult =
 async function getSupabaseConfig(): Promise<ConfigResult> {
     const localConfig = {
         NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-        NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || "",
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
         NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
     }
 
-    if (localConfig.NEXT_PUBLIC_SUPABASE_URL && localConfig.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY) {
+    if (localConfig.NEXT_PUBLIC_SUPABASE_URL && localConfig.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
         return {
             success: true,
             config: localConfig,
