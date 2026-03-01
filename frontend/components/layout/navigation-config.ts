@@ -17,7 +17,7 @@ export const adminNavGroups = [
     items: [
       { href: "/admin/dashboard", label: "Dashboard", icon: "layout-dashboard" as NavIconName },
       { href: "/admin/map", label: "Map", icon: "map" as NavIconName },
-      { href: "/admin/map", label: "Work Orders", icon: "clipboard-list" as NavIconName }
+      { href: "/work-orders", label: "Work Orders", icon: "clipboard-list" as NavIconName }
     ]
   },
   {
