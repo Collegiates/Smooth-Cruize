@@ -1,8 +1,5 @@
 "use client";
 
-import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
-import type { SupabaseClient } from "@supabase/supabase-js";
-
 export type UserProfileRecord = {
   id: string;
   email: string | null;
@@ -31,31 +28,31 @@ const demoProfiles: UserProfileRecord[] = [
   }
 ];
 
-export async function getUserProfiles(supabase?: SupabaseClient): Promise<UserProfileRecord[]> {
-  if (!hasSupabaseEnv()) {
+function getApiUrl() {
+  return process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+}
+
+export async function getUserProfiles(): Promise<UserProfileRecord[]> {
+  if (!process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL) {
     return demoProfiles;
   }
 
-  const client = supabase ?? getSupabaseBrowserClient();
+  const response = await fetch(`${getApiUrl()}/api/user-profiles`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
 
-  if (!client) {
-    return [];
+  if (!response.ok) {
+    throw new Error(await response.text());
   }
 
-  const { data, error } = await client
-    .from("user_profiles")
-    .select("id, email, full_name, is_admin, created_at, updated_at")
-    .order("created_at", { ascending: false });
-
-  if (error) {
-    throw error;
-  }
-
-  return (data as UserProfileRecord[]) ?? [];
+  return (await response.json()) as UserProfileRecord[];
 }
 
-export async function updateUserProfileAdmin(id: string, isAdmin: boolean, supabase?: SupabaseClient): Promise<UserProfileRecord> {
-  if (!hasSupabaseEnv()) {
+export async function updateUserProfileAdmin(id: string, isAdmin: boolean): Promise<UserProfileRecord> {
+  if (!process.env.NEXT_PUBLIC_API_URL && !process.env.NEXT_PUBLIC_SUPABASE_URL) {
     const profile = demoProfiles.find((item) => item.id === id);
 
     if (!profile) {
@@ -67,22 +64,24 @@ export async function updateUserProfileAdmin(id: string, isAdmin: boolean, supab
     return profile;
   }
 
-  const client = supabase ?? getSupabaseBrowserClient();
+  const response = await fetch(`${getApiUrl()}/api/user-profiles/${id}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ is_admin: isAdmin })
+  });
 
-  if (!client) {
-    throw new Error("Supabase client unavailable.");
+  if (!response.ok) {
+    throw new Error(await response.text());
   }
 
-  const { data, error } = await client
-    .from("user_profiles")
-    .update({ is_admin: isAdmin })
-    .eq("id", id)
-    .select("id, email, full_name, is_admin, created_at, updated_at")
-    .single();
+  const data = (await response.json()) as UserProfileRecord[];
+  const updated = Array.isArray(data) ? data[0] : (data as unknown as UserProfileRecord | null);
 
-  if (error) {
-    throw error;
+  if (!updated) {
+    throw new Error("Backend returned no updated user record.");
   }
 
-  return data as UserProfileRecord;
+  return updated;
 }

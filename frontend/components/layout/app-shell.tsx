@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 
 import { useSession } from "@/hooks/use-session";
 import { LeftNav } from "@/components/layout/left-nav";
+import { adminNavGroups } from "@/components/layout/navigation-config";
 import { TopHeader } from "@/components/layout/top-header";
 import type { NavIconName } from "@/components/layout/navigation-config";
 
@@ -59,11 +60,13 @@ export function AppShell({ title, subtitle, breadcrumbs, navGroups = [], childre
     };
   }, [breadcrumbs, pathname, title]);
 
-  const filteredGroups = navGroups
+  const effectiveNavGroups = session?.user.isAdmin ? adminNavGroups : navGroups;
+
+  const filteredGroups = effectiveNavGroups
     .map((group) => ({
       ...group,
       items: group.items.filter((item) => {
-        if (item.adminOnly && !session?.user.isAdmin) return false;
+        if ("adminOnly" in item && item.adminOnly && !session?.user.isAdmin) return false;
         if ("guestOnly" in item && item.guestOnly && session) return false;
         return true;
       })

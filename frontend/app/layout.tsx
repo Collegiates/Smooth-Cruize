@@ -26,16 +26,14 @@ import SupabaseProvider from "@/components/supabase-provider";
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const configResult = await getConfigForClient();
 
-  // If config fails, we still render the app but without the provider
-  // Or handle it based on your error boundary setup. We'll provide default empty strings.
   const supabaseUrl = configResult.success ? configResult.config.NEXT_PUBLIC_SUPABASE_URL : "";
-  const supabaseKey = configResult.success ? configResult.config.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY : "";
+  const supabaseAnonKey = configResult.success ? configResult.config.NEXT_PUBLIC_SUPABASE_ANON_KEY : "";
   const googleMapsApiKey = configResult.success ? configResult.config.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY : "";
 
   return (
     <html lang="en">
       <body className={`${manrope.variable} ${fraunces.variable} font-sans`}>
-        <SupabaseProvider supabaseUrl={supabaseUrl} supabaseKey={supabaseKey} googleMapsApiKey={googleMapsApiKey}>
+        <SupabaseProvider supabaseUrl={supabaseUrl} supabaseAnonKey={supabaseAnonKey} googleMapsApiKey={googleMapsApiKey}>
           <AppProvider>{children}</AppProvider>
         </SupabaseProvider>
       </body>

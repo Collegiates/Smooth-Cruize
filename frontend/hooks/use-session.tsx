@@ -52,6 +52,10 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
     void hydrateSession();
 
+    if (!supabase) {
+      return;
+    }
+
     const {
       data: { subscription }
     } = supabase.auth.onAuthStateChange(() => {

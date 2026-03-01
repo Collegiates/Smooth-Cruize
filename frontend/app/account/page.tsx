@@ -5,32 +5,26 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { AppShell } from "@/components/layout/app-shell";
+import { useSupabase } from "@/components/supabase-provider";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { publicNavGroups } from "@/components/layout/navigation-config";
 import { useSession } from "@/hooks/use-session";
-import { getSupabaseBrowserClient, hasSupabaseEnv } from "@/lib/supabase/client";
 import type { Profile } from "@/lib/types";
 
 type DatabaseProfile = Pick<Profile, "id" | "email" | "full_name" | "is_admin">;
 
 export default function AccountPage() {
   const router = useRouter();
+  const supabase = useSupabase();
   const { session, isLoading, signOut } = useSession();
   const [profile, setProfile] = useState<DatabaseProfile | null>(null);
   const [isProfileLoading, setIsProfileLoading] = useState(false);
 
   useEffect(() => {
     const loadProfile = async () => {
-      if (!session?.user.id || !hasSupabaseEnv()) {
+      if (!session?.user.id || !supabase) {
         setProfile(session?.profile ?? null);
-        return;
-      }
-
-      const supabase = getSupabaseBrowserClient();
-
-      if (!supabase) {
-        setProfile(session.profile);
         return;
       }
 
@@ -52,7 +46,7 @@ export default function AccountPage() {
     };
 
     void loadProfile();
-  }, [session]);
+  }, [session, supabase]);
 
   const activeProfile = profile ?? session?.profile ?? null;
 
