@@ -7,10 +7,11 @@ context clips (buffer before/after detections) to an output folder.
 import argparse
 from pathlib import Path
 from typing import List, Optional, Tuple
+import requests
+import os
 
 import cv2
 from ultralytics import YOLO
-
 
 VIDEO_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".m4v"}
 
@@ -141,6 +142,29 @@ def write_clip(
     return written
 
 
+def upload_clip_to_backend(clip_path: Path, api_url: str) -> bool:
+    """Uploads the generated clip to the backend API."""
+    try:
+        with open(clip_path, "rb") as f:
+            files = {"video": (clip_path.name, f, "video/mp4")}
+            response = requests.post(api_url, files=files)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("status") == "success":
+                    print(f"  -> Successfully uploaded to API! Event ID: {data.get('event_id')}")
+                    return True
+                else:
+                    print(f"  -> API Upload Failed: {data.get('message')}")
+                    return False
+            else:
+                print(f"  -> API returned status code {response.status_code}: {response.text}")
+                return False
+    except Exception as e:
+        print(f"  -> Error occurred while uploading to API: {e}")
+        return False
+
+
 def process_video(
     video_path: Path,
     output_dir: Path,
@@ -150,6 +174,8 @@ def process_video(
     pothole_class: Optional[str],
     skip_frames: int,
     imgsz: int,
+    api_url: Optional[str] = None,
+    keep_clips: bool = True,
 ) -> int:
     windows, fps, total_frames = detect_clip_windows(
         video_path=video_path,
@@ -174,6 +200,12 @@ def process_video(
     for idx, (start_t, end_t) in enumerate(windows, start=1):
         start_frame = max(0, int(start_t * fps))
         end_frame = min(total_frames - 1, int(end_t * fps)) if total_frames > 0 else int(end_t * fps)
+        
+        # Hard cap the clip size to a maximum of 600 frames
+        if (end_frame - start_frame) > 600:
+            print(f"  -> Warning: Clip {idx:03d} exceeds 600 frames. Truncating to 600 frames.")
+            end_frame = start_frame + 600
+            
         clip_path = output_dir / f"{video_path.stem}_clip_{idx:03d}.mp4"
         written_frames = write_clip(
             cap=cap,
@@ -188,6 +220,16 @@ def process_video(
                 f"  -> {clip_path.name} "
                 f"(start={start_t:.2f}s, end={end_t:.2f}s, frames={written_frames})"
             )
+            
+            # Send to backend if API URL is provided
+            if api_url:
+                print(f"  -> Uploading {clip_path.name} to {api_url}...")
+                success = upload_clip_to_backend(clip_path, api_url)
+                
+                # Optionally delete local file after successful upload
+                if success and not keep_clips:
+                    print(f"  -> Cleaning up local clip file: {clip_path.name}")
+                    os.remove(clip_path)
 
     cap.release()
     return clips_written
@@ -195,7 +237,7 @@ def process_video(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Process all videos in an input folder and write pothole clips to output."
+        description="Process all videos in an input folder, write pothole clips to output, and optionally upload them to a backend API."
     )
     parser.add_argument("--input-dir", type=str, default="input_videos", help="Folder containing input videos.")
     parser.add_argument("--output-dir", type=str, default="output_clips", help="Folder to write generated clips.")
@@ -209,8 +251,8 @@ def main() -> None:
     parser.add_argument(
         "--buffer-seconds",
         type=float,
-        default=3.0,
-        help="Seconds before and after each detection (default: 3.0).",
+        default=3.5,
+        help="Seconds before and after each detection (default: 3.5).",
     )
     parser.add_argument(
         "--pothole-class",
@@ -220,6 +262,20 @@ def main() -> None:
     )
     parser.add_argument("--skip-frames", type=int, default=1, help="Run inference every N frames (default: 1).")
     parser.add_argument("--imgsz", type=int, default=640, help="Inference image size (default: 640).")
+    
+    # New Backend API arguments
+    parser.add_argument(
+        "--api-url", 
+        type=str, 
+        default="http://localhost:8000/api/upload-clip", 
+        help="Backend API endpoint to automatically send the generated clips (default: http://localhost:8000/api/upload-clip)."
+    )
+    parser.add_argument(
+        "--keep-clips", 
+        action="store_true", 
+        help="Keep local clips after a successful upload to the API. If not set, clips are deleted to save space."
+    )
+    
     args = parser.parse_args()
 
     input_dir = Path(args.input_dir)
@@ -264,9 +320,11 @@ def main() -> None:
             pothole_class=class_filter,
             skip_frames=args.skip_frames,
             imgsz=args.imgsz,
+            api_url=args.api_url,
+            keep_clips=args.keep_clips,
         )
 
-    print(f"\nDone. Wrote {total_clips} clip(s) to {output_dir}.")
+    print(f"\nDone. Processed {total_clips} clip(s).")
 
 
 if __name__ == "__main__":

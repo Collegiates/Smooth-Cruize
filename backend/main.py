@@ -9,6 +9,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pydantic import BaseModel
+from video.send_clip import router as video_router  # Use standard import, rename send-clip to send_clip later
 
 try:
     import certifi
@@ -34,6 +35,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(video_router)
 
 @app.get("/")
 def root():
