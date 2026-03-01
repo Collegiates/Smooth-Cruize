@@ -84,7 +84,7 @@ export function AdminMapView() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="text-sm text-gray-600">Admin map workspace for live pothole triage and work order assignment.</div>
+        <div className="text-sm text-slate-400">Admin map workspace for live pothole triage and work order assignment.</div>
         <div className="flex flex-wrap items-center gap-2">
           <CreateWorkOrderDialog
             onCreated={(event) => {
@@ -129,9 +129,9 @@ export function AdminMapView() {
         </Widget>
 
         <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-2 rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-slate-900/80 backdrop-blur-xl p-3">
             <Select value={filters.status ?? "all"} onValueChange={(value) => setFilters((current) => ({ ...current, status: value as EventFilters["status"] }))}>
-              <SelectTrigger className="h-9 w-[160px] rounded-lg border-gray-200 text-sm">
+              <SelectTrigger className="h-9 w-[160px] rounded-lg border-white/10 bg-slate-800 text-slate-100 text-sm">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -144,8 +144,8 @@ export function AdminMapView() {
               </SelectContent>
             </Select>
             <div className="w-full max-w-[220px]">
-              <Label className="mb-1 block text-xs text-gray-500">Severity Range</Label>
-              <div className="flex items-center gap-2 text-xs text-gray-500">
+              <Label className="mb-1 block text-xs text-cyan-300/70">Severity Range</Label>
+              <div className="flex items-center gap-2 text-xs text-slate-400">
                 <Input
                   type="range"
                   min={1}
@@ -161,13 +161,15 @@ export function AdminMapView() {
                 <span>{filters.severityRange?.[1] ?? 10}</span>
               </div>
             </div>
-            <Button variant="outline" className="h-9 rounded-lg px-3 text-sm">
+            <Button variant="outline" className="h-9 rounded-lg border-white/10 bg-slate-800 px-3 text-sm text-slate-300 hover:bg-slate-700 hover:text-white">
               <LocateFixed className="mr-2 h-4 w-4" />
               Center on my city
             </Button>
             <button
               type="button"
-              className={`inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-sm ${liveUpdates ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-gray-200 bg-white text-gray-600"
+              className={`inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-sm ${liveUpdates
+                  ? "border-emerald-400/30 bg-emerald-500/10 text-emerald-400"
+                  : "border-white/10 bg-slate-800 text-slate-400"
                 }`}
               onClick={() => setLiveUpdates((value) => !value)}
             >
@@ -253,15 +255,15 @@ function DrawerPanel({
 
   return (
     <aside
-      className={`fixed inset-y-4 right-4 z-40 w-full max-w-[380px] rounded-2xl border border-gray-200 bg-white shadow-sm transition-transform ${open ? "translate-x-0" : "translate-x-[110%]"
+      className={`fixed inset-y-4 right-4 z-40 w-full max-w-[380px] rounded-2xl border border-white/10 bg-slate-900/95 backdrop-blur-xl shadow-[0_8px_30px_rgb(0,0,0,0.3)] transition-transform ${open ? "translate-x-0" : "translate-x-[110%]"
         }`}
       aria-hidden={!open}
     >
       <div className="flex h-full flex-col">
-        <div className="flex items-start justify-between border-b border-gray-200 px-4 py-4">
+        <div className="flex items-start justify-between border-b border-white/10 px-4 py-4">
           <div>
-            <div className="text-sm font-semibold text-gray-900">Work Order Drawer</div>
-            <div className="mt-1 text-xs text-gray-500">
+            <div className="text-sm font-semibold text-slate-100">Work Order Drawer</div>
+            <div className="mt-1 text-xs text-slate-400">
               {event.id.slice(0, 8)} • {formatDateTime(event.detected_at)}
             </div>
           </div>
@@ -271,7 +273,7 @@ function DrawerPanel({
         </div>
         <div className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4">
           <div className="space-y-2">
-            <video controls poster={event.thumbnail_url} className="rounded-lg border border-gray-200">
+            <video controls poster={event.thumbnail_url} className="rounded-lg border border-white/10">
               <source src={event.clip_url} />
             </video>
             <div className="flex flex-wrap gap-2">
@@ -280,16 +282,16 @@ function DrawerPanel({
             </div>
           </div>
 
-          <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
-            <div className="text-xs text-gray-500">AI Draft</div>
-            <p className="mt-1 text-sm text-gray-700">{event.description_ai ?? "No AI draft available."}</p>
+          <div className="rounded-lg border border-cyan-400/20 bg-cyan-500/5 p-3">
+            <div className="text-xs font-semibold uppercase tracking-widest text-cyan-400/80">AI Draft</div>
+            <p className="mt-1 text-sm text-slate-300">{event.description_ai ?? "No AI draft available."}</p>
           </div>
 
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label className="text-xs text-gray-500">Status</Label>
+              <Label className="text-xs text-cyan-300/70">Status</Label>
               <Select value={status} onValueChange={(value) => setStatus(value as PotholeStatus)}>
-                <SelectTrigger className="h-9 rounded-lg border-gray-200 text-sm">
+                <SelectTrigger className="h-9 rounded-lg border-white/10 bg-slate-800 text-slate-100 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -302,8 +304,8 @@ function DrawerPanel({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs text-gray-500">Assign</Label>
-              <Input className="h-9 rounded-lg border-gray-200 text-sm" value={assignedTo} onChange={(eventInput) => setAssignedTo(eventInput.target.value)} />
+              <Label className="text-xs text-cyan-300/70">Assign</Label>
+              <Input className="h-9 rounded-lg border-white/10 bg-slate-800 text-slate-100 text-sm" value={assignedTo} onChange={(eventInput) => setAssignedTo(eventInput.target.value)} />
             </div>
             <div className="flex flex-wrap gap-2">
               <Button className="h-9 rounded-lg px-3 text-sm" disabled={saving} onClick={() => void saveQuickUpdate()}>

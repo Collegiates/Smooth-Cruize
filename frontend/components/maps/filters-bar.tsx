@@ -16,15 +16,15 @@ type FiltersBarProps = {
 
 export function FiltersBar({ filters, onChange, showSearch = false }: FiltersBarProps) {
   return (
-    <div className="border border-slate-300 bg-white">
-      <div className="grid gap-2 p-2 lg:grid-cols-6">
+    <div className="rounded-xl border border-white/10 bg-slate-900/80 backdrop-blur-xl">
+      <div className="grid gap-2 p-3 lg:grid-cols-6">
         <div className="space-y-2">
-          <Label className="text-[11px] uppercase tracking-[0.08em] text-slate-500">Status</Label>
+          <Label className="text-[11px] uppercase tracking-[0.08em] text-cyan-300/70">Status</Label>
           <Select
             value={filters.status ?? "all"}
             onValueChange={(value) => onChange({ ...filters, status: value as EventFilters["status"] })}
           >
-            <SelectTrigger className="h-8 rounded-sm border-slate-400 text-xs">
+            <SelectTrigger className="h-8 rounded-lg border-white/10 bg-slate-800 text-xs text-slate-100">
               <SelectValue placeholder="All statuses" />
             </SelectTrigger>
             <SelectContent>
@@ -39,7 +39,7 @@ export function FiltersBar({ filters, onChange, showSearch = false }: FiltersBar
         </div>
 
         <div className="space-y-2">
-          <Label className="text-[11px] uppercase tracking-[0.08em] text-slate-500">Min severity</Label>
+          <Label className="text-[11px] uppercase tracking-[0.08em] text-cyan-300/70">Min severity</Label>
           <Input
             type="range"
             min={1}
@@ -52,11 +52,11 @@ export function FiltersBar({ filters, onChange, showSearch = false }: FiltersBar
               })
             }
           />
-          <p className="text-[11px] text-slate-500">{filters.severityRange?.[0] ?? 1}</p>
+          <p className="text-[11px] text-slate-400">{filters.severityRange?.[0] ?? 1}</p>
         </div>
 
         <div className="space-y-2">
-          <Label className="text-[11px] uppercase tracking-[0.08em] text-slate-500">Max severity</Label>
+          <Label className="text-[11px] uppercase tracking-[0.08em] text-cyan-300/70">Max severity</Label>
           <Input
             type="range"
             min={1}
@@ -69,24 +69,24 @@ export function FiltersBar({ filters, onChange, showSearch = false }: FiltersBar
               })
             }
           />
-          <p className="text-[11px] text-slate-500">{filters.severityRange?.[1] ?? 10}</p>
+          <p className="text-[11px] text-slate-400">{filters.severityRange?.[1] ?? 10}</p>
         </div>
 
         <div className="space-y-2">
-          <Label className="text-[11px] uppercase tracking-[0.08em] text-slate-500">Date from</Label>
+          <Label className="text-[11px] uppercase tracking-[0.08em] text-cyan-300/70">Date from</Label>
           <Input
             type="date"
-            className="h-8 rounded-sm border-slate-400 text-xs"
+            className="h-8 rounded-lg border-white/10 bg-slate-800 text-xs text-slate-100"
             value={filters.dateFrom ?? ""}
             onChange={(event) => onChange({ ...filters, dateFrom: event.target.value || undefined })}
           />
         </div>
 
         <div className="space-y-2">
-          <Label className="text-[11px] uppercase tracking-[0.08em] text-slate-500">Date to</Label>
+          <Label className="text-[11px] uppercase tracking-[0.08em] text-cyan-300/70">Date to</Label>
           <Input
             type="date"
-            className="h-8 rounded-sm border-slate-400 text-xs"
+            className="h-8 rounded-lg border-white/10 bg-slate-800 text-xs text-slate-100"
             value={filters.dateTo ?? ""}
             onChange={(event) => onChange({ ...filters, dateTo: event.target.value || undefined })}
           />
@@ -96,15 +96,15 @@ export function FiltersBar({ filters, onChange, showSearch = false }: FiltersBar
           {showSearch ? (
             <Input
               placeholder="Search notes or assignment"
-              className="h-8 rounded-sm border-slate-400 text-xs"
+              className="h-8 rounded-lg border-white/10 bg-slate-800 text-xs text-slate-100 placeholder:text-slate-500"
               value={filters.search ?? ""}
               onChange={(event) => onChange({ ...filters, search: event.target.value })}
             />
           ) : null}
-          <label className="flex items-center gap-2 text-xs font-medium text-slate-700">
+          <label className="flex items-center gap-2 text-xs font-medium text-slate-300">
             <input
               type="checkbox"
-              className="h-4 w-4 rounded border-border"
+              className="h-4 w-4 rounded border-white/20"
               checked={Boolean(filters.showHeatmap)}
               onChange={(event) => onChange({ ...filters, showHeatmap: event.target.checked })}
             />
@@ -112,7 +112,7 @@ export function FiltersBar({ filters, onChange, showSearch = false }: FiltersBar
           </label>
           <Button
             variant="outline"
-            className="h-8 rounded-sm border-slate-400 px-2 text-xs"
+            className="h-8 rounded-lg border-white/10 bg-slate-800 px-2 text-xs text-slate-300 hover:bg-slate-700 hover:text-white"
             onClick={() =>
               onChange({
                 status: "all",

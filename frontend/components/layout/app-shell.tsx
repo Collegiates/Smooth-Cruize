@@ -74,7 +74,7 @@ export function AppShell({ title, subtitle, breadcrumbs, navGroups = [], childre
     .filter((group) => group.items.length > 0);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-sm text-gray-900">
+    <div className="min-h-screen text-sm text-foreground">
       <LeftNav
         navGroups={filteredGroups}
         pathname={pathname}
@@ -100,7 +100,7 @@ export function AppShell({ title, subtitle, breadcrumbs, navGroups = [], childre
             router.push("/map");
           }}
         />
-        <main className="min-h-[calc(100vh-56px)] bg-gray-50 p-4">{children}</main>
+        <main className="min-h-[calc(100vh-56px)] bg-transparent px-4 pb-5 pt-4">{children}</main>
       </div>
     </div>
   );

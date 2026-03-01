@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: ["class"],
+  darkMode: "class",
   content: [
     "./app/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -51,14 +51,14 @@ const config: Config = {
         sm: "calc(var(--radius) - 4px)"
       },
       boxShadow: {
-        panel: "0 20px 80px -40px rgba(15, 23, 42, 0.4)"
+        panel: "0 20px 70px -28px rgba(8, 20, 42, 0.75), 0 0 0 1px rgba(109, 146, 216, 0.14)"
       },
       fontFamily: {
         sans: ["var(--font-sans)", "ui-sans-serif", "system-ui"],
         display: ["var(--font-display)", "ui-serif", "Georgia"]
       },
       backgroundImage: {
-        grid: "linear-gradient(to right, rgba(15, 23, 42, 0.06) 1px, transparent 1px), linear-gradient(to bottom, rgba(15, 23, 42, 0.06) 1px, transparent 1px)"
+        grid: "linear-gradient(to right, rgba(109, 146, 216, 0.2) 1px, transparent 1px), linear-gradient(to bottom, rgba(109, 146, 216, 0.2) 1px, transparent 1px)"
       }
     }
   },

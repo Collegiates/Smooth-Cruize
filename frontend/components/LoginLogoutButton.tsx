@@ -12,7 +12,7 @@ export default async function LoginLogoutButton() {
             <form action="/logout" method="get">
                 <button
                     type="submit"
-                    className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-all hover:bg-gray-50 hover:shadow"
+                    className="rounded-lg border border-slate-500/70 bg-slate-900/80 px-4 py-2 text-sm font-medium text-slate-100 shadow-sm transition-all hover:bg-slate-800 hover:shadow"
                 >
                     Sign Out
                 </button>
