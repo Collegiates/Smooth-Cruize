@@ -1,3 +1,5 @@
+# NOTE: This file is not used in the current version of the project.
+
 import os
 import requests
 from pathlib import Path
