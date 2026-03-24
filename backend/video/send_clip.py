@@ -8,7 +8,7 @@ import tempfile
 import json
 import time
 from datetime import datetime
-from video.gps_data import GPSData
+from backend.video.gps_data import GPSData
 import random
 
 # Initialize mock GPS Data
@@ -33,8 +33,10 @@ async def upload_pothole_clip(
     video: UploadFile = File(...),
     latitude: float = location.getLatitude(),
     longitude: float = location.getLongitude(),
-    vehicle_id: str = supabase.table("survey_vehicles").select("id").execute().data[0]["id"] # The UUID from your survey_vehicles table
+    vehicle_id: str = None
 ):
+    if not vehicle_id:
+        vehicle_id = supabase.table("survey_vehicles").select("id").execute().data[0]["id"]
     try:
         # 1. Read the uploaded video file
         file_bytes = await video.read()

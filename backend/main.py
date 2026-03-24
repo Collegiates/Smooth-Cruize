@@ -4,12 +4,11 @@ import ssl
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote
 from urllib.request import Request, urlopen
-import video
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from pydantic import BaseModel
-from video.send_clip import router as video_router  # Use standard import, rename send-clip to send_clip later
+from backend.video.send_clip import router as video_router  # Use standard import, rename send-clip to send_clip later
 
 try:
     import certifi
