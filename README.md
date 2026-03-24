@@ -58,10 +58,19 @@ The frontend runs on `http://localhost:3000` by default.
 1. Start the backend first.
 2. Start the frontend second.
 3. Open `http://localhost:3000`.
-4. (Optional) Add a .mp4 file to `videoprocessing/input_videos/` folder and run the video processing function in a separate terminal **(stick to videos under 30 seconds unless you like to wait)**:
+4. **(Option A) Run Live Camera Detection:** In a new terminal, activate the backend environment and start the live stream. You can use your laptop webcam (Source `0`) or connect to a network camera stream (RTSP/HTTP).
 ```bash
-cd videoprocessing
-python process_input_folder.py
+source backend/.venv/bin/activate
+# For a laptop USB webcam:
+python videoprocessing/live/live_inference.py --source 0 --show
+# Or for an IP Camera Stream over the network:
+# python videoprocessing/live/live_inference.py --source "rtsp://camera_ip/stream"
+```
+
+5. **(Option B) Run Offline Video Batching:** Add an `.mp4` file to the `videoprocessing/manual/input_videos/` folder and run the batch processor **(stick to videos under 30 seconds unless you like to wait)**:
+```bash
+source backend/.venv/bin/activate
+python videoprocessing/manual/process_input_folder.py
 ```
 
 **Note:** You will need the correct environment variables set in your `.env` file for the program to work. We cannot provide these. 

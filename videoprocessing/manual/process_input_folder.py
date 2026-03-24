@@ -239,13 +239,14 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="Process all videos in an input folder, write pothole clips to output, and optionally upload them to a backend API."
     )
-    parser.add_argument("--input-dir", type=str, default="input_videos", help="Folder containing input videos.")
-    parser.add_argument("--output-dir", type=str, default="output_clips", help="Folder to write generated clips.")
+    base_dir = Path(__file__).resolve().parent
+    parser.add_argument("--input-dir", type=str, default=str(base_dir / "input_videos"), help="Folder containing input videos.")
+    parser.add_argument("--output-dir", type=str, default=str(base_dir / "output_clips"), help="Folder to write generated clips.")
     parser.add_argument(
         "--model",
         type=str,
-        default="best.pt",
-        help="Path to YOLO model weights (default: best.pt).",
+        default=str(base_dir.parent / "best.pt"),
+        help="Path to YOLO model weights.",
     )
     parser.add_argument("--conf", type=float, default=0.25, help="Confidence threshold (default: 0.25).")
     parser.add_argument(

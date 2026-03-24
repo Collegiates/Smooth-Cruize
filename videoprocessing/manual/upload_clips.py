@@ -64,11 +64,12 @@ def upload_clips(output_dir: str, api_url: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload generated video clips to the backend API.")
+    base_dir = Path(__file__).resolve().parent
     parser.add_argument(
         "--output-dir", 
         type=str, 
-        default="output_clips", 
-        help="Folder containing the clips to upload (default: output_clips)."
+        default=str(base_dir / "output_clips"), 
+        help="Folder containing the clips to upload."
     )
     parser.add_argument(
         "--api-url", 

@@ -17,11 +17,12 @@ def main():
         type=str,
         help="Path to input video file",
     )
+    base_dir = Path(__file__).resolve().parent
     parser.add_argument(
         "--model",
         type=str,
-        default="best.pt",
-        help="Path to YOLO model weights (default: best.pt)",
+        default=str(base_dir.parent / "best.pt"),
+        help="Path to YOLO model weights",
     )
     parser.add_argument(
         "-o", "--output",
