@@ -2,7 +2,7 @@
 
 This document outlines the step-by-step strategy for deploying the Smooth Cruize YOLO pothole detection pipeline onto a specialized edge device aboard a public transportation vehicle (e.g., a bus). The edge device will run independently, processing live feeds and syncing directly to the centralized cloud database.
 
-## Stage 1: Wireless Live Video Capture (Dashcam)
+## ***DONE** Stage 1: Wireless Live Video Capture (Dashcam)
 **Objective:** Capture the continuous dashcam feed wirelessly over the vehicle's local network or via USB.
 **Details:**
 - Connect the edge device to the dashcam's broadcast stream or via USB.
